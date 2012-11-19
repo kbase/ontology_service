@@ -14,7 +14,7 @@ module Ontology : Ontology
   typedef list<GeneID> GeneIDList;
   typedef list<Domain> DomainList;
   typedef list<EvidenceCode> EvidenceCodeList;
-  typedef map<GeneID,GoIDList> GeneIDMap2GoIDList;
+  typedef mapping<GeneID,GoIDList> GeneIDMap2GoIDList;
 
   typedef structure {
     GoID goID;
@@ -25,17 +25,17 @@ module Ontology : Ontology
   typedef list<Enrichment> EnrichmentList;
   
   /* get go id list */
-  funcdef getGOIDList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList) returns GeneIDMap2GoIDList results;
+  funcdef getGOIDList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList) returns (GeneIDMap2GoIDList results);
 
   /* TODO: add documentation....get go id list */
-  funcdef getGOIDLimitedList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns GeneIDMap2GoIDList results;
+  funcdef getGOIDLimitedList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
 
   /* get go id list */
-  funcdef getGoDesc(GoIDList goIDList) returns map<GoID, String> results;
+  funcdef getGoDesc(GoIDList goIDList) returns (mapping<GoID, String> results);
 
   /* get go id list */
-  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns EnrichmentList results;  
+  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
 
   /* get go id list */
-  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns EnrichmentList results;  
+  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns (EnrichmentList results);  
 };
