@@ -38,3 +38,4 @@ module Ontology : Ontology
 
   /* get go id list */
   funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns EnrichmentList results;  
+};
