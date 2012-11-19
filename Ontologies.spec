@@ -34,8 +34,8 @@ module Ontology : Ontology
   funcdef getGoDesc(GoIDList goIDList) returns (mapping<GoID, string> results);
 
   /* get go id list */
-  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
+  funcdef getGOEnrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
 
   /* get go id list */
-  funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns (EnrichmentList results);  
+  funcdef getGOLimitedEnrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns (EnrichmentList results);  
 };
