@@ -127,16 +127,16 @@ sub getGOIDList
 
     my %g2idlist = (); # gene to id list
     $results = \%g2idlist;
-    my $pstmt = $dbh->prepare("select OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where TranscriptID = ?, OntologyType = 'GO'");
+    my $pstmt = $dbh->prepare("select OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where TranscriptID = ? and OntologyType = 'GO'");
     foreach my $geneID (@{$geneIDList}) {
 
       $pstmt->bind_param(1, $geneID);
       $pstmt->execute();
-      while( my @data = $pstmt->getchrow_array()) {
+      while( my @data = $pstmt->fetchrow_array()) {
         next if ! defined $domainMap{$data[2]};
         next if ! defined $ecMap{$data[3]};
         $g2idlist{$geneID} = [] if(! defined $g2idlist{$geneID}) ;
-        push $g2idlist{$geneID}, $data[1];
+        push $g2idlist{$geneID}, $data[0];
       } # end of fetch and counting
     } # end of types
 
@@ -236,13 +236,13 @@ sub getGOIDLimitedList
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOIDLimitedList
-    my $frst = getGoIDList($geneIDList, $domainList, $ecList);
+    my $frst = getGOIDList($self, $geneIDList, $domainList, $ecList);
 
     my %trst = ();
     $results = \%trst;
     
     foreach my $key (keys %{$frst}) {
-      my $n = $#$frst->{$key};
+      my $n = $#{$frst->{$key}};
       $trst{$key}= $frst->{$key} if($n >= $minCount && $n <= $maxCount);
     }
 
@@ -329,7 +329,7 @@ sub getGoDesc
 
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();
-      while( my @data = $pstmt->getchrow_array()) {
+      while( my @data = $pstmt->fetchrow_array()) {
         $go2desc{$goID} = $data[0];
       } # end of fetch and counting
     } # end of types
@@ -436,7 +436,7 @@ sub getGOEnrichment
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOEnrichment
-    my $frst = getGoIDList($geneIDList, $domainList, $ecList);
+    my $frst = getGOIDList($self, $geneIDList, $domainList, $ecList);
     my %ukey = ();
     foreach my $geneID (keys %{$frst}) {
       foreach my $goID (@{$frst->{$geneID}}) {
@@ -455,13 +455,14 @@ sub getGOEnrichment
     my $ra_goDescList = getGoDesc(\@goIDList);
     my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList, 99999999999); # TODO: 9999 to int_max
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
-      my $goDesc = $ra_goDescList[$goIDList[$i]];
+      my $goDesc = $$ra_goDescList[$goIDList[$i]];
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
-      my %rst{"pvalue"} = 0.01;
-      my %rst{"goDesc"} = $goDesc;
-      my %rst{"goID"} = $goIDList[$i];
+      my %rst = ();
+      $rst{"pvalue"} = 0.01;
+      $rst{"goDesc"} = $goDesc;
+      $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
     }
     
@@ -574,7 +575,7 @@ sub getGOLimitedEnrichment
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOLimitedEnrichment
-    my $frst = getGoIDList($geneIDList, $domainList, $ecList, $minCount, $maxCount);
+    my $frst = getGOIDLimitedList($self, $geneIDList, $domainList, $ecList, $minCount, $maxCount);
     my %ukey = ();
     foreach my $geneID (keys %{$frst}) {
       foreach my $goID (@{$frst->{$geneID}}) {
@@ -591,15 +592,16 @@ sub getGOLimitedEnrichment
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
     my $ra_goDescList = getGoDesc(\@goIDList);
-    my $rh_goID2Count = getGoSize($geneIDList, $domainList, $, 99999999999); # TODO: 9999 to int_max
+    my $rh_goID2Count = getGoSize($geneIDList, $domainList, 0, 99999999999); # TODO: 9999 to int_max
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
-      my $goDesc = $ra_goDescList[$goIDList[$i]];
+      my $goDesc = $$ra_goDescList[$goIDList[$i]];
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
-      my %rst{"pvalue"} = 0.01;
-      my %rst{"goDesc"} = $goDesc;
-      my %rst{"goID"} = $goIDList[$i];
+      my %rst = ();
+      $rst{"pvalue"} = 0.01;
+      $rst{"goDesc"} = $goDesc;
+      $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
     }
     #END getGOLimitedEnrichment
