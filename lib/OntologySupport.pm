@@ -15,7 +15,7 @@ sub getGoSize(
     my %ecMap = map {$_ => 1} @{$ecList};
 
     my %goID2Count = (); # gene to id list
-    my $pstmt = $dbh->prepare("select TranscriptID, OntologyDomain, OntologyEvidenceCode from ontologies where OntologyID = ?, OntologyType = 'GO'");
+    my $pstmt = $dbh->prepare("select TranscriptID, OntologyDomain, OntologyEvidenceCode from ontologies where OntologyID = ? and OntologyType = 'GO'");
     foreach my $goID (@{$goIDList}) {
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();
