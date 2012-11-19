@@ -16,6 +16,8 @@ Ontology
 =cut
 
 #BEGIN_HEADER
+use DBI;
+#use IDServerAPIClient;
 #END_HEADER
 
 sub new
