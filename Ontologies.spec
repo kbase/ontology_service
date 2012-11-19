@@ -31,7 +31,7 @@ module Ontology : Ontology
   funcdef getGOIDLimitedList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
 
   /* get go id list */
-  funcdef getGoDesc(GoIDList goIDList) returns (mapping<GoID, String> results);
+  funcdef getGoDesc(GoIDList goIDList) returns (mapping<GoID, string> results);
 
   /* get go id list */
   funcdef getGOIDFromTo(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
