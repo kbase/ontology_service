@@ -2,7 +2,7 @@ package OntologySupport;
 use strict;
 use DBI;
 
-sub getGoSize( 
+sub getGoSize { 
     (my $goIDList, my $domainList, my $ecList) = @_;
 
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
