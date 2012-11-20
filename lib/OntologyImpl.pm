@@ -19,6 +19,7 @@ Ontology
 use DBI;
 use POSIX;
 use OntologySupport;
+use Text::NSP::Measures::2D::Fisher::twotailed;
 #use IDServerAPIClient;
 #END_HEADER
 
@@ -462,7 +463,7 @@ sub getGOEnrichment
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = Text::NSP::Measures::2D::Fisher::twotailed::calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
+      $rst{"pvalue"} = calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
@@ -601,7 +602,7 @@ sub getGOLimitedEnrichment
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = Text::NSP::Measures::2D::Fisher::twotailed::calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
+      $rst{"pvalue"} = calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
