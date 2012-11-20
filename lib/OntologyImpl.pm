@@ -453,7 +453,7 @@ sub getGOEnrichment
 
     $results = [];
 
-    my $geneSize = $#$geneIDList;
+    my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
     my $rh_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize(\@goIDList, $domainList, $ecList);
@@ -463,7 +463,7 @@ sub getGOEnrichment
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
+      $rst{"pvalue"} = calculateStatistic(n11 => $ukey{$goIDList[$i]}, n1p => $geneSize, np1 => $goSize, npp => $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
@@ -592,7 +592,7 @@ sub getGOLimitedEnrichment
 
     $results = [];
 
-    my $geneSize = $#$geneIDList;
+    my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
     my $rh_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize(\@goIDList, $domainList, $ecList);
@@ -602,7 +602,7 @@ sub getGOLimitedEnrichment
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
+      $rst{"pvalue"} = calculateStatistic(n11 => $ukey{$goIDList[$i]}, n1p => $geneSize, np1 => $goSize, npp => $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
