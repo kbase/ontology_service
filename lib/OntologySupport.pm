@@ -1,6 +1,13 @@
 package OntologySupport;
 use strict;
 use DBI;
+use Exporter;
+use vars qw($VERSION @ISA @EXPORT);
+
+$VERSION     = 1.00;
+@ISA         = qw(Exporter);
+@EXPORT      = qw(getGoSize);
+
 
 sub getGoSize { 
     (my $goIDList, my $domainList, my $ecList) = @_;
