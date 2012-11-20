@@ -453,7 +453,7 @@ sub getGOEnrichment
 
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
-    my $ra_goDescList = getGoDesc(\@goIDList);
+    my $ra_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $$ra_goDescList[$goIDList[$i]];
@@ -592,7 +592,7 @@ sub getGOLimitedEnrichment
 
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
-    my $ra_goDescList = getGoDesc(\@goIDList);
+    my $ra_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $$ra_goDescList[$goIDList[$i]];
