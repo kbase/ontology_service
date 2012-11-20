@@ -26,7 +26,7 @@ sub getGoSize {
     foreach my $goID (@{$goIDList}) {
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();
-      while( my @data = $pstmt->getchrow_array()) {
+      while( my @data = $pstmt->fetchrow_array()) {
         next if ! defined $domainMap{$data[2]};
         next if ! defined $ecMap{$data[3]};
         $goID2Count{$goID} = 0 if(! defined $goID2Count{$goID});
