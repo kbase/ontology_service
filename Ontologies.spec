@@ -7,6 +7,7 @@
 module Ontology : Ontology
 {
 
+  typedef string Species;
   /* GoID : Unique GO term id (Source: external Gene Ontology database - http://www.geneontology.org/) */
   typedef string GoID;
   /* GoDesc : Human readable text description of the corresponding GO term */
@@ -51,7 +52,7 @@ module Ontology : Ontology
 	 want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function
 	 returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of
 	 one of more go-ids. Also, a note on the input list: only one item per line is allowed. */
-  funcdef getGOIDList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList) returns (GeneIDMap2GoIDList results);
+  funcdef getGOIDList(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList) returns (GeneIDMap2GoIDList results);
 
   /* For a given list of Features from a particular genome (for example Arabidopsis thaliana) extract corresponding 
      list of GO identifiers. This function call accepts five parameters: a list of gene-identifiers, a list of ontology domains,
@@ -63,7 +64,7 @@ module Ontology : Ontology
 	 gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned 
 	 table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item 
 	 per line is allowed.  */
-  funcdef getGOIDLimitedList(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
+  funcdef getGOIDLimitedList(Species sname, Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
 
   /* Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) 
      and returns a table of two columns, first column being the go-id and the second column being the go-term description. */
@@ -76,7 +77,7 @@ module Ontology : Ontology
 	 and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied 
 	 as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists.
 	 Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test. */
-  funcdef getGOEnrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
+  funcdef getGOEnrichment(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
 
   /* For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
      terms in your feature-set. This function accepts six parameters: a list of gene-identifiers, a list of ontology domains,
@@ -87,5 +88,5 @@ module Ontology : Ontology
 	 initial results then it is recommended to provide empty domain and evidence code lists. In any case, a mapping of only those 
 	 gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit is carried forward. Final filtered 
 	 list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test. */
-  funcdef getGOLimitedEnrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns (EnrichmentList results);  
+  funcdef getGOLimitedEnrichment(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount, TestType type) returns (EnrichmentList results);  
 };
