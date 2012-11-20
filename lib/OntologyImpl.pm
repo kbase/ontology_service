@@ -17,6 +17,7 @@ Ontology
 
 #BEGIN_HEADER
 use DBI;
+use POSIX;
 #use IDServerAPIClient;
 #END_HEADER
 
@@ -453,14 +454,14 @@ sub getGOEnrichment
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
     my $ra_goDescList = getGoDesc(\@goIDList);
-    my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList, 99999999999); # TODO: 9999 to int_max
+    my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $$ra_goDescList[$goIDList[$i]];
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = 0.01;
+      $rst{"pvalue"} = Text::NSP::Measures::2D::Fisher::twotailed::calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
@@ -592,14 +593,14 @@ sub getGOLimitedEnrichment
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
     my $ra_goDescList = getGoDesc(\@goIDList);
-    my $rh_goID2Count = getGoSize($geneIDList, $domainList, 0, 99999999999); # TODO: 9999 to int_max
+    my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $$ra_goDescList[$goIDList[$i]];
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
       my %rst = ();
-      $rst{"pvalue"} = 0.01;
+      $rst{"pvalue"} = Text::NSP::Measures::2D::Fisher::twotailed::calculateStatistic($ukey{$goIDList[$i]}, $goSize, $geneSize, $wholeGeneSize);
       $rst{"goDesc"} = $goDesc;
       $rst{"goID"} = $goIDList[$i];
       push @$results, \%rst;
