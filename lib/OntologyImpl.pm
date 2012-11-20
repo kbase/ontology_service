@@ -454,10 +454,10 @@ sub getGOEnrichment
 
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
-    my $ra_goDescList = getGoDesc($self, \@goIDList);
+    my $rh_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
-      my $goDesc = ${$ra_goDescList}[$i];
+      my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
@@ -593,10 +593,10 @@ sub getGOLimitedEnrichment
 
     my $geneSize = $#$geneIDList;
     my @goIDList = keys %ukey;
-    my $ra_goDescList = getGoDesc($self, \@goIDList);
+    my $rh_goDescList = getGoDesc($self, \@goIDList);
     my $rh_goID2Count = getGoSize($geneIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
-      my $goDesc = ${$ra_goDescList}[$i];
+      my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
       my $wholeGeneSize = 22000; # temporary... based on gene ID <-- need to be changed...
       # calc p-value using any h.g. test
