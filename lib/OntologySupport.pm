@@ -28,3 +28,5 @@ sub getGoSize {
     } 
     return \%goID2Count;
 }
+
+1;
