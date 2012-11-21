@@ -18,7 +18,7 @@ This module provides public interface/APIs for KBase plant ontology services. It
 #BEGIN_HEADER
 use DBI;
 use POSIX;
-use OntologySupport;
+use Bio::KBase::OntologyService::OntologySupport;
 use Text::NSP::Measures::2D::Fisher::twotailed;
 #use IDServerAPIClient;
 #END_HEADER
