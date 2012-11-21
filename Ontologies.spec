@@ -1,6 +1,6 @@
 /*
 
- TODO: Sunita, please put overal description of service here
+ This module provides public interface/APIs for KBase plant ontology services. It encapsulates the basic functionality of extracting domain ontologies (e.g. biological process, molecular function, cellular process) from ontology types (such as GO, PO, TO, EO etc) of interest for a given set of species specific genes. Additionally, it also allows ontology enrichment analysis to be performed on a set of genes that may be, say for example, over-expressed in drought stress in plant roots. To support these key features, currently this modules provides five API-functions that are backed by custom defined data structures. Majority of these API-functions accept a list of input items (majority of them being text strings) such as list of gene-ids, list of go-ids, list of ontology-domains, and list of ontology-types and return the requested results as tabular dataset.
 
  */
 
@@ -45,7 +45,7 @@ module Ontology : Ontology
   typedef list<Enrichment> EnrichmentList;
   
   /* For a given list of Features (aka Genes) from a particular genome (for example Arabidopsis thaliana) extract corresponding 
-     list of GO identifiers. This function call accepts three parameters: a list of gene-identifiers, a list of ontology domains,
+     list of GO identifiers. This function call accepts four parameters: specie name, a list of gene-identifiers, a list of ontology domains,
 	 and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list
 	 of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from 
 	 KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't  
@@ -55,7 +55,7 @@ module Ontology : Ontology
   funcdef getGOIDList(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList) returns (GeneIDMap2GoIDList results);
 
   /* For a given list of Features from a particular genome (for example Arabidopsis thaliana) extract corresponding 
-     list of GO identifiers. This function call accepts five parameters: a list of gene-identifiers, a list of ontology domains,
+     list of GO identifiers. This function call accepts six parameters: specie name, a list of gene-identifiers, a list of ontology domains,
 	 a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene  
 	 identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the 
 	 domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by 
@@ -64,14 +64,14 @@ module Ontology : Ontology
 	 gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned 
 	 table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item 
 	 per line is allowed.  */
-  funcdef getGOIDLimitedList(Species sname, Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
+  funcdef getGOIDLimitedList(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, int minCount, int maxCount) returns (GeneIDMap2GoIDList results);
 
   /* Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) 
      and returns a table of two columns, first column being the go-id and the second column being the go-term description. */
   funcdef getGoDesc(GoIDList goIDList) returns (mapping<GoID, string> results);
 
   /* For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
-     terms in your feature-set. This function accepts four parameters: a list of gene-identifiers, a list of ontology domains,
+     terms in your feature-set. This function accepts five parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
 	 a list of evidence codes, and ontology type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however 
 	 the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id 
 	 and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied 
@@ -80,7 +80,7 @@ module Ontology : Ontology
   funcdef getGOEnrichment(Species sname, GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
 
   /* For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
-     terms in your feature-set. This function accepts six parameters: a list of gene-identifiers, a list of ontology domains,
+     terms in your feature-set. This function accepts seven parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
 	 a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and ontology 
 	 type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of 
 	 evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are 
