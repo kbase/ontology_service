@@ -11,7 +11,7 @@ Ontology
 
 =head1 DESCRIPTION
 
-
+This module provides public interface/APIs for KBase plant ontology services. It encapsulates the basic functionality of extracting domain ontologies (e.g. biological process, molecular function, cellular process) from ontology types (such as GO, PO, TO, EO etc) of interest for a given set of species specific genes. Additionally, it also allows ontology enrichment analysis to be performed on a set of genes that may be, say for example, over-expressed in drought stress in plant roots. To support these key features, currently this modules provides five API-functions that are backed by custom defined data structures. Majority of these API-functions accept a list of input items (majority of them being text strings) such as list of gene-ids, list of go-ids, list of ontology-domains, and list of ontology-types and return the requested results as tabular dataset.
 
 =cut
 
@@ -45,7 +45,7 @@ sub new
 
 =head2 getGOIDList
 
-  $results = $obj->getGOIDList($geneIDList, $domainList, $ecList)
+  $results = $obj->getGOIDList($sname, $geneIDList, $domainList, $ecList)
 
 =over 4
 
@@ -54,10 +54,12 @@ sub new
 =begin html
 
 <pre>
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoIDList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -74,10 +76,12 @@ GoID is a string
 
 =begin text
 
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoIDList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -95,7 +99,14 @@ GoID is a string
 
 =item Description
 
-get go id list
+For a given list of Features (aka Genes) from a particular genome (for example Arabidopsis thaliana) extract corresponding 
+list of GO identifiers. This function call accepts four parameters: specie name, a list of gene-identifiers, a list of ontology domains,
+    and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list
+    of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from 
+    KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't  
+    want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function
+    returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of
+    one of more go-ids. Also, a note on the input list: only one item per line is allowed.
 
 =back
 
@@ -104,9 +115,10 @@ get go id list
 sub getGOIDList
 {
     my $self = shift;
-    my($geneIDList, $domainList, $ecList) = @_;
+    my($sname, $geneIDList, $domainList, $ecList) = @_;
 
     my @_bad_arguments;
+    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -130,7 +142,7 @@ sub getGOIDList
 
     my %g2idlist = (); # gene to id list
     $results = \%g2idlist;
-    my $pstmt = $dbh->prepare("select OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where TranscriptID = ? and OntologyType = 'GO'");
+    my $pstmt = $dbh->prepare("select OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = ? and OntologyType = 'GO'");
     foreach my $geneID (@{$geneIDList}) {
 
       $pstmt->bind_param(1, $geneID);
@@ -159,7 +171,7 @@ sub getGOIDList
 
 =head2 getGOIDLimitedList
 
-  $results = $obj->getGOIDLimitedList($geneIDList, $domainList, $ecList, $minCount, $maxCount)
+  $results = $obj->getGOIDLimitedList($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount)
 
 =over 4
 
@@ -168,12 +180,14 @@ sub getGOIDList
 =begin html
 
 <pre>
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $minCount is an int
 $maxCount is an int
 $results is a GeneIDMap2GoIDList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -190,12 +204,14 @@ GoID is a string
 
 =begin text
 
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $minCount is an int
 $maxCount is an int
 $results is a GeneIDMap2GoIDList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -213,7 +229,16 @@ GoID is a string
 
 =item Description
 
-TODO: add documentation....get go id list
+For a given list of Features from a particular genome (for example Arabidopsis thaliana) extract corresponding 
+list of GO identifiers. This function call accepts six parameters: specie name, a list of gene-identifiers, a list of ontology domains,
+    a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene  
+    identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the 
+    domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by 
+    using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results 
+    then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those 
+    gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned 
+    table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item 
+    per line is allowed.
 
 =back
 
@@ -222,9 +247,10 @@ TODO: add documentation....get go id list
 sub getGOIDLimitedList
 {
     my $self = shift;
-    my($geneIDList, $domainList, $ecList, $minCount, $maxCount) = @_;
+    my($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount) = @_;
 
     my @_bad_arguments;
+    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -239,7 +265,7 @@ sub getGOIDLimitedList
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOIDLimitedList
-    my $frst = getGOIDList($self, $geneIDList, $domainList, $ecList);
+    my $frst = getGOIDList($self, $sname, $geneIDList, $domainList, $ecList);
 
     my %trst = ();
     $results = \%trst;
@@ -297,7 +323,8 @@ GoID is a string
 
 =item Description
 
-get go id list
+Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) 
+and returns a table of two columns, first column being the go-id and the second column being the go-term description.
 
 =back
 
@@ -352,7 +379,7 @@ sub getGoDesc
 
 =head2 getGOEnrichment
 
-  $results = $obj->getGOEnrichment($geneIDList, $domainList, $ecList, $type)
+  $results = $obj->getGOEnrichment($sname, $geneIDList, $domainList, $ecList, $type)
 
 =over 4
 
@@ -361,11 +388,13 @@ sub getGoDesc
 =begin html
 
 <pre>
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -387,11 +416,13 @@ GoDesc is a string
 
 =begin text
 
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -414,7 +445,13 @@ GoDesc is a string
 
 =item Description
 
-get go id list
+For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
+terms in your feature-set. This function accepts five parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
+    a list of evidence codes, and ontology type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however 
+    the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id 
+    and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied 
+    as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists.
+    Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test.
 
 =back
 
@@ -423,9 +460,10 @@ get go id list
 sub getGOEnrichment
 {
     my $self = shift;
-    my($geneIDList, $domainList, $ecList, $type) = @_;
+    my($sname, $geneIDList, $domainList, $ecList, $type) = @_;
 
     my @_bad_arguments;
+    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -439,7 +477,7 @@ sub getGOEnrichment
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOEnrichment
-    my $frst = getGOIDList($self, $geneIDList, $domainList, $ecList);
+    my $frst = getGOIDList($self, $sname, $geneIDList, $domainList, $ecList);
     my %ukey = ();
     foreach my $geneID (keys %{$frst}) {
       foreach my $goID (@{$frst->{$geneID}}) {
@@ -456,7 +494,7 @@ sub getGOEnrichment
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
     my $rh_goDescList = getGoDesc($self, \@goIDList);
-    my $rh_goID2Count = getGoSize(\@goIDList, $domainList, $ecList);
+    my $rh_goID2Count = getGoSize($sname, \@goIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
@@ -485,7 +523,7 @@ sub getGOEnrichment
 
 =head2 getGOLimitedEnrichment
 
-  $results = $obj->getGOLimitedEnrichment($geneIDList, $domainList, $ecList, $minCount, $maxCount, $type)
+  $results = $obj->getGOLimitedEnrichment($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount, $type)
 
 =over 4
 
@@ -494,6 +532,7 @@ sub getGOEnrichment
 =begin html
 
 <pre>
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
@@ -501,6 +540,7 @@ $minCount is an int
 $maxCount is an int
 $type is a TestType
 $results is an EnrichmentList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -522,6 +562,7 @@ GoDesc is a string
 
 =begin text
 
+$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
@@ -529,6 +570,7 @@ $minCount is an int
 $maxCount is an int
 $type is a TestType
 $results is an EnrichmentList
+Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -551,7 +593,15 @@ GoDesc is a string
 
 =item Description
 
-get go id list
+For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
+terms in your feature-set. This function accepts seven parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
+    a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and ontology 
+    type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of 
+    evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are 
+    further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the 
+    initial results then it is recommended to provide empty domain and evidence code lists. In any case, a mapping of only those 
+    gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit is carried forward. Final filtered 
+    list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test.
 
 =back
 
@@ -560,9 +610,10 @@ get go id list
 sub getGOLimitedEnrichment
 {
     my $self = shift;
-    my($geneIDList, $domainList, $ecList, $minCount, $maxCount, $type) = @_;
+    my($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount, $type) = @_;
 
     my @_bad_arguments;
+    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -578,7 +629,7 @@ sub getGOLimitedEnrichment
     my $ctx = $OntologyServer::CallContext;
     my($results);
     #BEGIN getGOLimitedEnrichment
-    my $frst = getGOIDLimitedList($self, $geneIDList, $domainList, $ecList, $minCount, $maxCount);
+    my $frst = getGOIDLimitedList($self, $sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount);
     my %ukey = ();
     foreach my $geneID (keys %{$frst}) {
       foreach my $goID (@{$frst->{$geneID}}) {
@@ -595,7 +646,7 @@ sub getGOLimitedEnrichment
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
     my $rh_goDescList = getGoDesc($self, \@goIDList);
-    my $rh_goID2Count = getGoSize(\@goIDList, $domainList, $ecList);
+    my $rh_goID2Count = getGoSize($sname, \@goIDList, $domainList, $ecList);
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
@@ -659,6 +710,32 @@ sub version {
 
 
 
+=head2 Species
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 GoID
 
 =over 4
@@ -667,7 +744,7 @@ sub version {
 
 =item Description
 
-GoID
+GoID : Unique GO term id (Source: external Gene Ontology database - http://www.geneontology.org/)
 
 
 =item Definition
@@ -698,7 +775,7 @@ a string
 
 =item Description
 
-GoDesc :
+GoDesc : Human readable text description of the corresponding GO term
 
 
 =item Definition
@@ -727,6 +804,12 @@ a string
 
 
 
+=item Description
+
+Unique identifier of a species specific Gene (aka Feature entity in KBase parlence). This ID is also an external identifier
+that exists in the public databases such as Gramene, Ensembl, NCBI etc.
+
+
 =item Definition
 
 =begin html
@@ -751,6 +834,11 @@ a string
 
 =over 4
 
+
+
+=item Description
+
+Evidence code indicates how the annotation to a particular term is supported. See - http://www.geneontology.org/GO.evidence.shtml
 
 
 =item Definition
@@ -779,6 +867,11 @@ a string
 
 
 
+=item Description
+
+Captures which branch of knowledge the GO terms refers to e.g. "Biological Process", "Molecular Function", "Cellular Process" etc.
+
+
 =item Definition
 
 =begin html
@@ -803,6 +896,11 @@ a string
 
 =over 4
 
+
+
+=item Description
+
+Ontology type, whether it's a Gene Ontology or Plant Ontology or Trait Ontology or Environment Ontology
 
 
 =item Definition
@@ -831,6 +929,11 @@ a string
 
 
 
+=item Description
+
+A list of ontology identifiers
+
+
 =item Definition
 
 =begin html
@@ -855,6 +958,11 @@ a reference to a list where each element is a GoID
 
 =over 4
 
+
+
+=item Description
+
+a list of GO terms description
 
 
 =item Definition
@@ -883,6 +991,11 @@ a reference to a list where each element is a GoDesc
 
 
 
+=item Description
+
+A list of gene identifiers from same species
+
+
 =item Definition
 
 =begin html
@@ -907,6 +1020,11 @@ a reference to a list where each element is a GeneID
 
 =over 4
 
+
+
+=item Description
+
+A list of ontology domains
 
 
 =item Definition
@@ -935,6 +1053,11 @@ a reference to a list where each element is a Domain
 
 
 
+=item Description
+
+A list of ontology term evidence codes. One ontology term can have one or more evidence codes.
+
+
 =item Definition
 
 =begin html
@@ -961,6 +1084,11 @@ a reference to a list where each element is an EvidenceCode
 
 
 
+=item Description
+
+A list of gene-id to go-id mappings. One gene-id can have one or more go-ids associated with it.
+
+
 =item Definition
 
 =begin html
@@ -985,6 +1113,11 @@ a reference to a hash where the key is a GeneID and the value is a GoIDList
 
 =over 4
 
+
+
+=item Description
+
+A composite data structure to capture ontology enrichment type object
 
 
 =item Definition
@@ -1019,6 +1152,11 @@ pvalue has a value which is a float
 
 =over 4
 
+
+
+=item Description
+
+A list of ontology enrichment objects
 
 
 =item Definition

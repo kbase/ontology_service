@@ -10,7 +10,7 @@ $VERSION     = 1.00;
 
 
 sub getGoSize { 
-    (my $goIDList, my $domainList, my $ecList) = @_;
+    (my $sname, my $goIDList, my $domainList, my $ecList) = @_;
 
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
   
@@ -22,7 +22,7 @@ sub getGoSize {
     my %ecMap = map {$_ => 1} @{$ecList};
 
     my %goID2Count = (); # gene to id list
-    my $pstmt = $dbh->prepare("select TranscriptID, OntologyDomain, OntologyEvidenceCode from ontologies where OntologyID = ? and OntologyType = 'GO'");
+    my $pstmt = $dbh->prepare("select TranscriptID, OntologyDomain, OntologyEvidenceCode from ontologies where SName = '$sname' and OntologyID = ? and OntologyType = 'GO'");
     foreach my $goID (@{$goIDList}) {
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();

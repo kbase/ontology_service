@@ -39,10 +39,10 @@ class Ontology:
         if self.timeout < 1:
             raise ValueError('Timeout value must be at least 1 second')
 
-    def getGOIDList(self, geneIDList, domainList, ecList):
+    def getGOIDList(self, sname, geneIDList, domainList, ecList):
 
         arg_hash = { 'method': 'Ontology.getGOIDList',
-                     'params': [geneIDList, domainList, ecList],
+                     'params': [sname, geneIDList, domainList, ecList],
                      'version': '1.1'
                      }
 
@@ -59,10 +59,10 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def getGOIDLimitedList(self, geneIDList, domainList, ecList, minCount, maxCount):
+    def getGOIDLimitedList(self, sname, geneIDList, domainList, ecList, minCount, maxCount):
 
         arg_hash = { 'method': 'Ontology.getGOIDLimitedList',
-                     'params': [geneIDList, domainList, ecList, minCount, maxCount],
+                     'params': [sname, geneIDList, domainList, ecList, minCount, maxCount],
                      'version': '1.1'
                      }
 
@@ -99,10 +99,10 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def getGOEnrichment(self, geneIDList, domainList, ecList, type):
+    def getGOEnrichment(self, sname, geneIDList, domainList, ecList, type):
 
         arg_hash = { 'method': 'Ontology.getGOEnrichment',
-                     'params': [geneIDList, domainList, ecList, type],
+                     'params': [sname, geneIDList, domainList, ecList, type],
                      'version': '1.1'
                      }
 
@@ -119,10 +119,10 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def getGOLimitedEnrichment(self, geneIDList, domainList, ecList, minCount, maxCount, type):
+    def getGOLimitedEnrichment(self, sname, geneIDList, domainList, ecList, minCount, maxCount, type):
 
         arg_hash = { 'method': 'Ontology.getGOLimitedEnrichment',
-                     'params': [geneIDList, domainList, ecList, minCount, maxCount, type],
+                     'params': [sname, geneIDList, domainList, ecList, minCount, maxCount, type],
                      'version': '1.1'
                      }
 
