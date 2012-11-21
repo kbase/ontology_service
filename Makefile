@@ -4,6 +4,14 @@ TARGET = /kb/deployment
 SERVICE_SPEC = Ontologies.spec
 SERVICE_NAME = OntologyService
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
+SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
+SERVER_MODULE = lib/Bio/KBase/OntologyService/Service.pm
+#SERVICE = OntologyService
+SERVICE_PORT = 7062
+
+TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
+TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) \
+        --define kb_service_port=$(SERVICE_PORT)
 
 #include $(TOP_DIR)/tools/Makefile.common
 
@@ -183,7 +191,25 @@ deploy-scripts:
 	done
 
 # Deploying a server refers to the deployment of ...{TODO}
-deploy-server:
+deploy-server: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-docs
+
+# TODO: need to be updated later
+deploy-libs:
+	rsync -arv lib/. $(TARGET)/lib/.
+
+deploy-dir:
+	mkdir -p $(SERVICE_DIR) 
+	mkdir -p $(SERVICE_DIR)/webroot
+
+deploy-monit:
+	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(TARGET)/services/$(SERVICE_NAME)/process.$(SERVICE_NAME)
+
+deploy-services:
+	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE_NAME)/start_service
+	chmod +x $(TARGET)/services/$(SERVICE_NAME)/start_service
+	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE_NAME)/stop_service
+	chmod +x $(TARGET)/services/$(SERVICE_NAME)/stop_service
+
 
 # Deploying docs here refers to the deployment of documentation
 # of the API. We'll include a description of deploying documentation
