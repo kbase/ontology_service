@@ -2,6 +2,7 @@ TOP_DIR = ../..
 DEPLOY_RUNTIME = /kb/runtime
 TARGET = /kb/deployment
 SERVICE_SPEC = Ontologies.spec
+SERVICE_NAME = OntologyService
 
 #include $(TOP_DIR)/tools/Makefile.common
 
