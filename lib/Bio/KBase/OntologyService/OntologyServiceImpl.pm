@@ -1,4 +1,4 @@
-package OntologyImpl;
+package Bio::KBase::OntologyService::OntologyServiceImpl;
 use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
@@ -128,7 +128,7 @@ sub getGOIDList
 							       method_name => 'getGOIDList');
     }
 
-    my $ctx = $OntologyServer::CallContext;
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGOIDList
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
@@ -262,7 +262,7 @@ sub getGOIDLimitedList
 							       method_name => 'getGOIDLimitedList');
     }
 
-    my $ctx = $OntologyServer::CallContext;
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGOIDLimitedList
     my $frst = getGOIDList($self, $sname, $geneIDList, $domainList, $ecList);
@@ -343,7 +343,7 @@ sub getGoDesc
 							       method_name => 'getGoDesc');
     }
 
-    my $ctx = $OntologyServer::CallContext;
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGoDesc
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
@@ -474,7 +474,7 @@ sub getGOEnrichment
 							       method_name => 'getGOEnrichment');
     }
 
-    my $ctx = $OntologyServer::CallContext;
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGOEnrichment
     my $frst = getGOIDList($self, $sname, $geneIDList, $domainList, $ecList);
@@ -626,7 +626,7 @@ sub getGOLimitedEnrichment
 							       method_name => 'getGOLimitedEnrichment');
     }
 
-    my $ctx = $OntologyServer::CallContext;
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGOLimitedEnrichment
     my $frst = getGOIDLimitedList($self, $sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount);

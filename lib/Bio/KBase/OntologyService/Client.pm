@@ -1,4 +1,4 @@
-package OntologyClient;
+package Bio::KBase::OntologyService::Client;
 
 use JSON::RPC::Client;
 use strict;
@@ -13,7 +13,7 @@ our $VERSION = "0.1.0";
 
 =head1 NAME
 
-OntologyClient
+Bio::KBase::OntologyService::Client
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ sub new
     my($class, $url, @args) = @_;
 
     my $self = {
-	client => OntologyClient::RpcClient->new,
+	client => Bio::KBase::OntologyService::Client::RpcClient->new,
 	url => $url,
     };
 
@@ -677,10 +677,10 @@ sub _validate_version {
         );
     }
     if ($sMinor > $cMinor) {
-        warn "New client version available for OntologyClient\n";
+        warn "New client version available for Bio::KBase::OntologyService::Client\n";
     }
     if ($sMajor == 0) {
-        warn "OntologyClient version is $svr_version. API subject to change.\n";
+        warn "Bio::KBase::OntologyService::Client version is $svr_version. API subject to change.\n";
     }
 }
 
@@ -1159,7 +1159,7 @@ a reference to a list where each element is an Enrichment
 
 =cut
 
-package OntologyClient::RpcClient;
+package Bio::KBase::OntologyService::Client::RpcClient;
 use base 'JSON::RPC::Client';
 
 #

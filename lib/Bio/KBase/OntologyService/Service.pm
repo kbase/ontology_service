@@ -1,4 +1,4 @@
-package OntologyServer;
+package Bio::KBase::OntologyService::Service;
 
 use Data::Dumper;
 use Moose;
@@ -42,7 +42,7 @@ sub call_method {
 
     my ($module, $method) = @$method_info{qw(module method)};
     
-    my $ctx = OntologyServerContext->new(client_ip => $self->_plack_req->address);
+    my $ctx = Bio::KBase::OntologyService::ServiceContext->new(client_ip => $self->_plack_req->address);
     
     my $args = $data->{arguments};
 
@@ -132,13 +132,13 @@ sub get_method
     return { module => $module, method => $method };
 }
 
-package OntologyServerContext;
+package Bio::KBase::OntologyService::ServiceContext;
 
 use strict;
 
 =head1 NAME
 
-OntologyServerContext
+Bio::KBase::OntologyService::ServiceContext
 
 head1 DESCRIPTION
 

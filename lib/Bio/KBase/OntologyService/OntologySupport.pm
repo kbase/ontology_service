@@ -1,4 +1,4 @@
-package OntologySupport;
+package Bio::KBase::OntologyService::OntologySupport;
 use strict;
 use DBI;
 use Exporter;
