@@ -2,10 +2,11 @@ The main functionality of ontology service :
 It allow retrieve ontology term distribution and ontology enrichment service given set of genes. Ontology term distribution and enrichment calculation is one of main function for Plant Feb. Demo. We included 13 Species GO annotations (refer to documentation).
 
 What's new in this release :
-This is our first release and have near full functionality from API to command scripts.
+This is our first release and have near full functionality from API.
 
 Next release plan:
 Currently, we only support hypergeometric test but we may include chi^2 test for better speed.
+CLI version will be supported in next version as well.
 
 Requirement for deployment:
 Please refer to readme.txt
