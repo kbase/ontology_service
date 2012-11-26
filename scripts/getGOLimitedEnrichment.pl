@@ -27,8 +27,6 @@ output is to the standard output.
 
 =head2 Documentation for underlying call
 
-This script is a wrapper for the CDMI-API call getGOLimitedEnrichment. It is documented as follows:
-
 For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
 terms in your feature-set. This function accepts seven parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
     a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and ontology 
