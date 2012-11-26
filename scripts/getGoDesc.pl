@@ -3,10 +3,6 @@ use Data::Dumper;
 use Carp;
 use Getopt::Long;
 
-#
-# This is a SAS Component
-#
-
 =head1 getGoDesc
 
 Example:
@@ -22,12 +18,12 @@ use
 
 where N is the column (from 1) that contains the identifier.
 
-This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+SJ: Keep this line : This is a pipe command. The input is taken from the standard input, and the
+SJ: Keep this line : output is to the standard output.
 
 =head2 Documentation for underlying call
 
-This script is a wrapper for the CDMI-API call getGoDesc. It is documented as follows:
+SJ: Take this line out => This script is a wrapper for the CDMI-API call getGoDesc. It is documented as follows:
 
 Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
 
