@@ -74,7 +74,7 @@ module Ontology : Ontology
 */
   typedef string EvidenceCode;
 
-  /* Captures which branch of knowledge the GO terms refers to e.g. "Biological Process", "Molecular Function", "Cellular Process" etc. */
+  /* Captures which branch of knowledge the GO terms refers to e.g. "biological_process", "molecular_function", "cellular_component" etc. */
   typedef string Domain;
 
   /* Test type, whether it's "hypergeometric" and "chisq"  */

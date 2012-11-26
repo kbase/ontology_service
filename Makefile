@@ -239,13 +239,14 @@ compile-docs: build-libs
 # have the most  up-to-date libs and documentation if your compile
 # docs depends on the compiled libs.
 build-libs:
-	mkdir -p scripts; compile_typespec \
+	mkdir -p scripts 
+	compile_typespec \
 		--psgi $(SERVICE_PSGI_FILE) \
 		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
 		--service Bio::KBase::$(SERVICE_NAME)::Service \
 		--client Bio::KBase::$(SERVICE_NAME)::Client \
 		--py biokbase/$(SERVICE_NAME)/Client \
 		--js javascript/$(SERVICE_NAME)/Client \
-		--scripts scripts \
 		$(SERVICE_SPEC) lib
 
+#		--scripts scripts \ # automatically generated script is not working

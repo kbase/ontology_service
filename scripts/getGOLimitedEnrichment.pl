@@ -1,6 +1,7 @@
 use strict;
 use Data::Dumper;
 use Carp;
+use Getopt::Long;
 
 #
 # This is a SAS Component
@@ -125,55 +126,80 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
+use Bio::KBase::OntologyService::Client;
 
-my $usage = "usage: getGOLimitedEnrichment [-c column] < input > output";
+my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] [--from_count=0] [--to_count=100000000] < geneIDs\n";
 
-use Bio::KBase::CDMI::CDMIClient;
-use Bio::KBase::Utilities::ScriptThing;
+my $host       = "140.221.92.223:7062";
+my $sname      = "Athaliana";
+my $domainList = "biological_process";
+my $ecList     = "IEA";
+my $type       = "hypergeometric";
+my $from       = 0;
+my $to         = 100000000;
+my $help       = 0;
+my $version    = 0;
 
-my $column;
+GetOptions("help"       => \$help,
+           "version"    => \$version,
+           "host=s"     => \$host, 
+           "species_name=s"    => \$sname, 
+           "domain_list=s" => \$domainList, 
+           "evidence_code_list=s" => \$ecList,
+           "from_count=s" => \$from,
+           "to_count=s" => \$to,
+           "test_type=s" => \$type) or die $usage;
 
-my $input_file;
-
-my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
-if (! $kbO) { print STDERR $usage; exit }
-
-my $ih;
-if ($input_file)
+if($help)
 {
-    open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+	print "$usage\n";
+	print "\n";
+	print "General options\n";
+	print "\t--host=[xxx.xxx.xx.xxx:xxxx]\t\thostname of the server\n";
+	print "\t--species_name=[xxx,yyy,zzz,...]\t\tspecies name list (comma separated)\n";
+	print "\t--domain_list=[biological_process,molecular_function,cellular_component]\t\tdomain list (comma separated)\n";
+	print "\t--evidence_code_list=[XXX,YYY,ZZZ,...]\t\tGO evidence code list (comma separated)\n";
+	print "\t--from_count=[0]\t\tthe minimun frequency of GO term to be considered\n";
+	print "\t--to_count=[100000000]\t\tthe maximum frequency of GO term to be considered\n";
+	print "\t--test_type=[hypergeometric|chisq]\t\tthe types of test\n";
+	print "\t--help\t\tprint help information\n";
+	print "\t--version\t\tprint version information\n";
+	print "\n";
+	print "Examples: \n";
+	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
+	print "\n";
+	print "echo AT1G71695.1 | $0 --evidence_code=IEA \n";
+	print "\n";
+	print "$0 --help\tprint out help\n";
+	print "\n";
+	print "$0 --version\tprint out version information\n";
+	print "\n";
+	print "Report bugs to Shinjae Yoo at sjyoo\@bnl.gov\n";
+	exit(1);
 }
-else
+
+if($version)
 {
-    $ih = \*STDIN;
+	print "$0 version 0.1\n";
+	print "Copyright (C) 2012 Shinjae Yoo\n";
+	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
+	print "This is free software: you are free to change and redistribute it.\n";
+	print "There is NO WARRANTY, to the extent permitted by law.\n";
+	print "\n";
+	print "Written by Shinjae Yoo and Sunita Kumari\n";
+	exit(1);
 }
 
-while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-    my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->getGOLimitedEnrichment(\@h);
-    for my $tuple (@tuples) {
-        #
-        # Process output here and print.
-        #
-        my ($id, $line) = @$tuple;
-        my $v = $h->{$id};
+die $usage unless @ARGV == 0;
 
-        if (! defined($v))
-        {
-            print STDERR $line,"\n";
-        }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
-            }
-        }
-        else
-        {
-            print "$line\t$v\n";
-        }
-    }
+my $oc = Bio::KBase::OntologyService::Client->new("http://".$host);
+my @dl = split/,/, $domainList;
+my @el = split/,/, $ecList;
+my @input = <STDIN>;
+my $istr = join(" ", @input);
+$istr =~ s/[,|]/ /g;
+@input = split /\s+/, $istr;
+my $results = $oc->getGOLimitedEnrichment($sname, \@input, \@dl, \@el, $from, $to, $type);
+foreach my $hr (@$results) {
+  print $hr->{"goID"}."\t".$hr->{"pvalue"}."\t".$hr->{"goDesc"}."\n";
 }

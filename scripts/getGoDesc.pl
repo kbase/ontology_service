@@ -1,6 +1,7 @@
 use strict;
 use Data::Dumper;
 use Carp;
+use Getopt::Long;
 
 #
 # This is a SAS Component
@@ -79,55 +80,58 @@ Input lines that cannot be extended are written to stderr.
 
 =cut
 
-use SeedUtils;
+use Bio::KBase::OntologyService::Client;
 
-my $usage = "usage: getGoDesc [-c column] < input > output";
+my $usage = "Usage: $0 [--host=140.221.92.223:7062] < goIDs\n";
 
-use Bio::KBase::CDMI::CDMIClient;
-use Bio::KBase::Utilities::ScriptThing;
+my $host       = "140.221.92.223:7062";
+my $help       = 0;
+my $version    = 0;
 
-my $column;
+GetOptions("help"       => \$help,
+           "version"    => \$version,
+           "host=s"     => \$host) or die $usage;
 
-my $input_file;
-
-my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
-				      'i=s' => \$input_file);
-if (! $kbO) { print STDERR $usage; exit }
-
-my $ih;
-if ($input_file)
+if($help)
 {
-    open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+	print "$usage\n";
+	print "\n";
+	print "General options\n";
+	print "\t--host=[xxx.xxx.xx.xxx:xxxx]\t\thostname of the server\n";
+	print "\t--help\t\tprint help information\n";
+	print "\t--version\t\tprint version information\n";
+	print "\n";
+	print "Examples: \n";
+	print "echo GO:0006979 | $0 --host=x.x.x.x:x \n";
+	print "\n";
+	print "$0 --help\tprint out help\n";
+	print "\n";
+	print "$0 --version\tprint out version information\n";
+	print "\n";
+	print "Report bugs to Shinjae Yoo at sjyoo\@bnl.gov\n";
+	exit(1);
 }
-else
+
+if($version)
 {
-    $ih = \*STDIN;
+	print "$0 version 0.1\n";
+	print "Copyright (C) 2012 Shinjae Yoo\n";
+	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
+	print "This is free software: you are free to change and redistribute it.\n";
+	print "There is NO WARRANTY, to the extent permitted by law.\n";
+	print "\n";
+	print "Written by Shinjae Yoo and Sunita Kumari\n";
+	exit(1);
 }
 
-while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
-    my @h = map { $_->[0] } @tuples;
-    my $h = $kbO->getGoDesc(\@h);
-    for my $tuple (@tuples) {
-        #
-        # Process output here and print.
-        #
-        my ($id, $line) = @$tuple;
-        my $v = $h->{$id};
+die $usage unless @ARGV == 0;
 
-        if (! defined($v))
-        {
-            print STDERR $line,"\n";
-        }
-        elsif (ref($v) eq 'ARRAY')
-        {
-            foreach $_ (@$v)
-            {
-                print "$line\t$_\n";
-            }
-        }
-        else
-        {
-            print "$line\t$v\n";
-        }
-    }
+my $oc = Bio::KBase::OntologyService::Client->new("http://".$host);
+my @input = <STDIN>;
+my $istr = join(" ", @input);
+$istr =~ s/[,|]/ /g;
+@input = split /\s+/, $istr;
+my $results = $oc->getGoDesc(\@input);
+foreach my $goID (keys %{$results}) {
+  print "$goID\t".$results->{"$goID"}."\n";
 }
