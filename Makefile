@@ -147,7 +147,7 @@ deploy: deploy-client deploy-scripts deploy-server
 # Deploy client should deploy the client artifacts, mainly
 # the application programming interface libraries, command
 # line scripts, and associated reference documentation.
-deploy-client: deploy-libs deploy-scripts deploy-docs
+deploy-client: deploy-dir deploy-libs deploy-scripts deploy-docs
 
 # The deploy-libs and deploy-scripts targets are used to recognize
 # and delineate the client types, mainly a set of libraries that
