@@ -28,16 +28,7 @@ output is to the standard output.
 
 This script is a wrapper for the CDMI-API call getGOIDLimitedList. It is documented as follows:
 
-For a given list of Features from a particular genome (for example Arabidopsis thaliana) extract corresponding 
-list of GO identifiers. This function call accepts six parameters: specie name, a list of gene-identifiers, a list of ontology domains,
-    a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene  
-    identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the 
-    domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by 
-    using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results 
-    then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those 
-    gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned 
-    table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item 
-    per line is allowed.
+For a given list of Features from a particular genome (for example "Athaliana") extract corresponding list of GO identifiers. This function call accepts six parameters: species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results  then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
 
 =over 4
 

@@ -28,13 +28,7 @@ output is to the standard output.
 
 This script is a wrapper for the CDMI-API call getGOEnrichment. It is documented as follows:
 
-For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
-terms in your feature-set. This function accepts five parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
-    a list of evidence codes, and ontology type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however 
-    the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id 
-    and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied 
-    as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists.
-    Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test.
+For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test.
 
 =over 4
 

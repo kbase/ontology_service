@@ -28,8 +28,7 @@ output is to the standard output.
 
 This script is a wrapper for the CDMI-API call getGoDesc. It is documented as follows:
 
-Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) 
-and returns a table of two columns, first column being the go-id and the second column being the go-term description.
+Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
 
 =over 4
 

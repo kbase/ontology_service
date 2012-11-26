@@ -28,14 +28,7 @@ output is to the standard output.
 
 This script is a wrapper for the CDMI-API call getGOIDList. It is documented as follows:
 
-For a given list of Features (aka Genes) from a particular genome (for example Arabidopsis thaliana) extract corresponding 
-list of GO identifiers. This function call accepts four parameters: specie name, a list of gene-identifiers, a list of ontology domains,
-    and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list
-    of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from 
-    KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't  
-    want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function
-    returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of
-    one of more go-ids. Also, a note on the input list: only one item per line is allowed.
+For a given list of Features (aka Genes) from a particular genome (for example "Athaliana" Arabidopsis thaliana ) extract corresponding list of GO identifiers. This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
 
 =over 4
 
