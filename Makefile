@@ -62,8 +62,8 @@ default:
 
 # Test Section
 
-test: test-client test-scripts test-server
-	echo "runnint client and script tests"
+test: test-client test-scripts test-service
+	echo "running client and script tests"
 
 # test-all is deprecated. 
 # test-all: test-client test-scripts test-server
@@ -109,7 +109,7 @@ test-scripts:
 # not have a test-server target that depends on the test-client
 # or test-scripts targets. Otherwise, a circular dependency
 # graph could result.
-test-server:
+test-service:
 	# run each test
 	for t in $(SERVER_TESTS) ; do \
 		if [ -f $$t ] ; then \
@@ -139,10 +139,9 @@ test-server:
 # of the server and it's related architecture. For illustrative
 # purposes, we include the dependency in the deploy target as we
 # prefer this when it is reasonable."
-deploy: deploy-client deploy-scripts deploy-server
+deploy: deploy-client
+deploy-all: deploy-client deploy-service
 
-# deploy-all is deprecated
-# deploy-all: deploy-client deploy-scripts deploy-server
 #
 # Deploy client should deploy the client artifacts, mainly
 # the application programming interface libraries, command
@@ -191,7 +190,7 @@ deploy-scripts:
 	done
 
 # Deploying a server refers to the deployment of ...{TODO}
-deploy-server: deploy-dir deploy-scripts deploy-libs deploy-services deploy-monit deploy-docs
+deploy-service: deploy-dir deploy-libs deploy-scripts deploy-services deploy-monit deploy-docs
 
 # TODO: need to be updated later
 deploy-libs:
