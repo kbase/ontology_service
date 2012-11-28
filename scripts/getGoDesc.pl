@@ -13,7 +13,7 @@ getGoDesc [--host=140.221.92.223:7062] < goIDs
 
 =head1 DESCRIPTION
 
-The standard input should be space character separted go ids.
+The standard input should be space character separated go ids.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
@@ -25,7 +25,7 @@ Extract GO term description for a given list of go-identifiers. This function ex
 
 =over 6
 
-=item B<-h> I<[xxx.xxx.xx.xxx:xxxx]> B<--host>=I<[xxx.xxx.xx.xxx:xxxx]>     
+=item B<-h> I<[140.221.92.223:7062]> B<--host>=I<[140.221.92.223:7062]>     
 hostname of the server
 
 =item B<--help>                                                             

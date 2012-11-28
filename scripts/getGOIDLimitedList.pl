@@ -3,104 +3,60 @@ use Data::Dumper;
 use Carp;
 use Getopt::Long;
 
-#
-# This is a SAS Component
-#
+=head1 NAME
 
-=head1 getGOIDLimitedList
+getGOIDLimitedList - get a limited list of GO identifiers corresponding to each feature in an input list.
 
-Example:
+=head1 SYNOPSIS
 
-    getGOIDLimitedList [arguments] < input > output
+getGOIDLimitedList [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--from_count=0] [--to_count=100000000] < geneIDs
 
-The standard input should be a tab-separated table (i.e., each line
-is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
-use
+=head1 DESCRIPTION
 
-    -c N
-
-where N is the column (from 1) that contains the identifier.
-
-This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+For a given list of Features from a particular genome (for example "Athaliana") extract corresponding list of GO identifiers. Here features essentially mean gene or protein or transcript identifiers.
 
 =head2 Documentation for underlying call
 
-For a given list of Features from a particular genome (for example "Athaliana") extract corresponding list of GO identifiers. This function call accepts six parameters: species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results  then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
+This function call accepts six parameters: species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results  then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit. Note that in the returned table of results, each gene-id is associated with a list of one of more go-ids.
 
-=over 4
+=head1 OPTIONS
 
-=item Parameter and return types
+=over 6
 
-=begin html
+=item B<-h> I<[140.221.92.223:7062]> B<--host>=I<[140.221.92.223:7062]>
+hostname of the server
 
-<pre>
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$results is a GeneIDMap2GoIDList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
+=item B<--help>
+prints help information
 
-</pre>
+=item B<--version>
+print version information
 
-=end html
+=item B<--host> host server
 
-=begin text
+=item B<--species_name> comma separated list of name species e.g. [Athaliana,Zmays]
 
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$results is a GeneIDMap2GoIDList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
+=item B<--domain_list> comma separated list of ontology domains e.g. [biological_process,molecular_function]
 
+=item B<--evidence_code_list> comma separated list of ontology evidence codes e.g. [IEA,IEP]
 
-=end text
+=item B<--from_count> Integer >=0 for a feature to have mininum number of GO terms
+
+=item B<--to_count> Integer >= from_count for a feature to have maximum number of GO terms
 
 =back
 
-=head2 Command-Line Options
+=head1 EXAMPLE
 
-=over 4
+ echo AT1G71695.1 | getGOIDLimitedList --host==140.221.92.223:7062
+ echo AT1G71695.1 | getGOIDLimitedList --evidence_code=IEA
+ echo AT1G71695 | getGOIDLimitedList --domain_list=[biological_process,cellular_component] --species_name=Athaliana
+ getGOIDLimitedList --help
+ getGOIDLimitedList --version
 
-=item -c Column
+=head1 VERSION
 
-This is used only if the column containing the identifier is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+0.1
 
 =cut
 
