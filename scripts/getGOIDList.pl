@@ -32,22 +32,22 @@ prints help information
 =item B<--version>
 print version information
 
-=B<--host> IP address and port of the host server e.g. --host=140.221.92.223:7062
+=item B<--host> IP address and port of the host server e.g. --host=140.221.92.223:7062
 
-=B<--species_name> comma separated list of speciens name e.g. --species=[Athaliana,Zmays]
+=item B<--species_name> comma separated list of species name e.g. --species=[Athaliana,Zmays]
 
-=B<--domain_list> comma separated list of ontology domains e.g. --domain_list=[biological_process,cellular_component]
+=item B<--domain_list> comma separated list of ontology domains e.g. --domain_list=[biological_process,cellular_component]
 
-=B<--evidence_code_list> comma separated list of ontology evidence codes e.g. --evidence_code_list=[IEA,IEP]
+=item B<--evidence_code_list> comma separated list of ontology evidence codes e.g. --evidence_code_list=[IEA,IEP]
 
 =back
 
 =head1 EXAMPLE
 
-echo AT1G71695.1 | getGOIDList --host=140.221.92.223:7062
-echo AT1G71695.1 | getGOIDList --evidence_code=IEA
-getGOIDList --help
-getGOIDList --version
+ echo AT1G71695.1 | getGOIDList --host=140.221.92.223:7062
+ echo AT1G71695.1 | getGOIDList --evidence_code=IEA
+ getGOIDList --help
+ getGOIDList --version
 
 =head1 VERSION
 

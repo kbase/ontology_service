@@ -42,7 +42,7 @@ print version information
 
 =item B<--test_type> statistical test to use for enrichment analysis [hypergeometric|chisq]
 
-=item B<--from_count> Integer >=0 for a feature to have mininum number of GO terms
+=item B<--from_count> Integer >=0 for a feature to have minimum number of GO terms
 
 =item B<--to_count> Integer >= from_count for a feature to have maximum number of GO terms
 
@@ -52,7 +52,7 @@ print version information
 
  echo AT1G71695.1 | getGOEnrichment --host=140.221.92.223:7062
  echo AT1G71695.1 | getGOEnrichment --evidence_code=[IEA,IEP]
- echo AT1G71695.1 | getGOEnrichment --species=[Athaliana] --domain_list=[molucular_function,biological_process] --evidence_code=[IEA,IEP]
+ echo AT1G71695.1 | getGOEnrichment --species=[Athaliana] --domain_list=[molecular_function,biological_process] --evidence_code=[IEA,IEP]
  getGOEnrichment --help
  getGOEnrichment --version
 

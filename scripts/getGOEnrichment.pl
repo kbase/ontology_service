@@ -10,7 +10,7 @@ getGOEnrichment - find out enriched GO terms in a set of genes.
 
 =head1 SYNOPSIS
 
-getGOEnrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
+getGOEnrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
 
 =head1 DESCRIPTION
 
@@ -36,11 +36,11 @@ print version information
 
 =item B<--species_name> comma separated list of species name e.g. [Athaliana,Zmays]
 
-=item B<--domain_list> comman separated list of ontology domains e.g. [biological_process,molecular_function]
+=item B<--domain_list> comman separated list of ontology domains e.g. [biological_process,molecular_function,cellular_component]
 
 =item B<--evidence_code_list> commma separated list of ontology term evidence code e.g [IEA,IEP]
 
-=item B--test_type> statistical test to use for enrichment analysis [hypergeometric|chisq]
+=item B<--test_type> statistical test to use for enrichment analysis [hypergeometric|chisq]
 
 =back
 

@@ -9,7 +9,7 @@ getGOIDLimitedList - get a limited list of GO identifiers corresponding to each 
 
 =head1 SYNOPSIS
 
-getGOIDLimitedList [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--from_count=0] [--to_count=100000000] < geneIDs
+getGOIDLimitedList [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--from_count=0] [--to_count=100000000] < geneIDs
 
 =head1 DESCRIPTION
 
@@ -40,7 +40,7 @@ print version information
 
 =item B<--evidence_code_list> comma separated list of ontology evidence codes e.g. [IEA,IEP]
 
-=item B<--from_count> Integer >=0 for a feature to have mininum number of GO terms
+=item B<--from_count> Integer >=0 for a feature to have minimum number of GO terms
 
 =item B<--to_count> Integer >= from_count for a feature to have maximum number of GO terms
 
