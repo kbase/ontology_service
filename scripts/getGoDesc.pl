@@ -3,21 +3,17 @@ use Data::Dumper;
 use Carp;
 use Getopt::Long;
 
-=head1 getGoDesc
+=head1 NAME
 
-Example:
+getGoDesc - get GO id description
 
-    getGoDesc [arguments] < input > output
+=head1 SYNOPSIS
 
-The standard input should be a tab-separated table (i.e., each line
-is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
-use
+getGoDesc [--host=140.221.92.223:7062] < goIDs
 
-    -c N
+=head1 DESCRIPTION
 
-where N is the column (from 1) that contains the identifier.
-
+The standard input should be space character separated go ids.
 This is a pipe command. The input is taken from the standard input, and the
 output is to the standard output.
 
@@ -25,53 +21,24 @@ output is to the standard output.
 
 Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
 
-=over 4
+=head1 OPTIONS
 
-=item Parameter and return types
+=over 6
 
-=begin html
+=item B<-h> I<[140.221.92.223:7062]> B<--host>=I<[140.221.92.223:7062]>     
+hostname of the server
 
-<pre>
-$goIDList is a GoIDList
-$results is a reference to a hash where the key is a GoID and the value is a string
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
+=item B<--help>                                                             
+print help information
 
-</pre>
-
-=end html
-
-=begin text
-
-$goIDList is a GoIDList
-$results is a reference to a hash where the key is a GoID and the value is a string
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
-
-
-=end text
+=item B<--version>                                                          
+print version information
 
 =back
 
-=head2 Command-Line Options
+=head1 SEE ALSO
 
-=over 4
-
-=item -c Column
-
-This is used only if the column containing the identifier is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
-
+L<getGOIDList(1)>, L<getGOIDLimitedList(1)> 
 =cut
 
 use Bio::KBase::OntologyService::Client;

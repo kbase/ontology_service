@@ -3,124 +3,62 @@ use Data::Dumper;
 use Carp;
 use Getopt::Long;
 
-#
-# This is a SAS Component
-#
+=head1 
 
-=head1 getGOLimitedEnrichment
+=head1 NAME
 
-Example:
+getGOLimitedEnrichment - find out enriched GO terms in a set of genes
 
-    getGOLimitedEnrichment [arguments] < input > output
+=head1 SYNOPSIS
 
-The standard input should be a tab-separated table (i.e., each line
-is a tab-separated set of fields).  Normally, the last field in each
-line would contain the identifer. If another column contains the identifier
-use
+getGOLimitedEnrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA,IEP]  [--test_type=hypergeometric|chisq] < geneIDsList
 
-    -c N
+=head1 DESCRIPTION
 
-where N is the column (from 1) that contains the identifier.
-
-This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO terms in your feature-set. Use this function to perform GO enrichment analysis on a set of genes using the filtered list of GO terms based on the input criteria.
 
 =head2 Documentation for underlying call
 
-For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
-terms in your feature-set. This function accepts seven parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
-    a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and ontology 
-    type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of 
-    evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are 
-    further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the 
-    initial results then it is recommended to provide empty domain and evidence code lists. In any case, a mapping of only those 
-    gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit is carried forward. Final filtered 
-    list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test.
+This function accepts seven parameters: Species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and test type (hypergeometric or chi-square). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. In any case, a mapping of only those gene-id to go-ids for which the count of go-ids per gene is between minimum and maximum count limit is carried forward. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test.
 
-=over 4
+=head1 OPTIONS
 
-=item Parameter and return types
+=over 6
 
-=begin html
+=item B<-h> I<[140.221.92.223:7062]> B<--host>=I<[140.221.92.223:7062]>
+hostname of the server
 
-<pre>
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$type is a TestType
-$results is an EnrichmentList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-TestType is a string
-EnrichmentList is a reference to a list where each element is an Enrichment
-Enrichment is a reference to a hash where the following keys are defined:
-	goID has a value which is a GoID
-	goDesc has a value which is a GoDesc
-	pvalue has a value which is a float
-GoID is a string
-GoDesc is a string
+=item B<--help>
+prints help information
 
-</pre>
+=item B<--version>
+print version information
 
-=end html
+=item B<--species_name> comma separated list of species name e.g. [Athaliana,Zmays]
 
-=begin text
+=item B<--domain_list> comman separated list of ontology domains e.g. [biological_process,molecular_function]
 
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$type is a TestType
-$results is an EnrichmentList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-TestType is a string
-EnrichmentList is a reference to a list where each element is an Enrichment
-Enrichment is a reference to a hash where the following keys are defined:
-	goID has a value which is a GoID
-	goDesc has a value which is a GoDesc
-	pvalue has a value which is a float
-GoID is a string
-GoDesc is a string
+=item B<--evidence_code_list> commma separated list of ontology term evidence code e.g [IEA,IEP]
 
+=item B<--test_type> statistical test to use for enrichment analysis [hypergeometric|chisq]
 
-=end text
+=item B<--from_count> Integer >=0 for a feature to have minimum number of GO terms
+
+=item B<--to_count> Integer >= from_count for a feature to have maximum number of GO terms
 
 =back
 
-=head2 Command-Line Options
+=head1 EXAMPLE
 
-=over 4
+ echo AT1G71695.1 | getGOEnrichment --host=140.221.92.223:7062
+ echo AT1G71695.1 | getGOEnrichment --evidence_code=[IEA,IEP]
+ echo AT1G71695.1 | getGOEnrichment --species=[Athaliana] --domain_list=[molecular_function,biological_process] --evidence_code=[IEA,IEP]
+ getGOEnrichment --help
+ getGOEnrichment --version
 
-=item -c Column
+=head1 VERSION
 
-This is used only if the column containing the identifier is not the last column.
-
-=item -i InputFile    [ use InputFile, rather than stdin ]
-
-=back
-
-=head2 Output Format
-
-The standard output is a tab-delimited file. It consists of the input
-file with extra columns added.
-
-Input lines that cannot be extended are written to stderr.
+0.1
 
 =cut
 

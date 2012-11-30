@@ -15,7 +15,7 @@ module Ontology : Ontology
      Creinhardtii: Chlamydomonas reinhardtii
      Gmax: Glycine max
      Oglaberrima: Oryza glaberrima
-     Oindica: Oryza sativa indiaca
+     Oindica: Oryza sativa indica
      Osativa: Oryza sativa japonica
      Ptrichocarpa: Populus trichocarpa 
      Sbicolor: Sorghum bicolor 

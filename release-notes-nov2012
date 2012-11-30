@@ -1,11 +1,18 @@
-The main functionality of ontology service :
-It allow retrieve ontology term distribution and ontology enrichment service given set of genes. Ontology term distribution and enrichment calculation is one of main function for Plant Feb. Demo. We included 13 Species GO annotations (refer to documentation).
+OVERVIEW
+-------------------------------------------------------------------------
 
-What's new in this release :
-This is our first release and have near full functionality from API to CLIs.
+The main functionality of ontology service is to allow the retrieval of ontology term distribution for a given a set of genes and additionally, identifies statistically overrepresented GO terms within given gene sets. Ontology term distribution and enrichment analysis are one of the main functions needed for the Plants Feb. Demo. Currently, this service provides GO annotation for 13 plant genomes (refer to documentation).
 
-Next release plan:
-Currently, we only support hypergeometric test but we may include chi^2 test for better speed.
+VERSION: 0.0.1 (Released 11/28/2012)
+---------------------------------------------------------------------------------------------
+NEW FEATURES:
+-This is our first internal release of the Gene Ontology Service.  We have near full functionality from API to CLIs.
 
-Requirement for deployment:
+UPDATED FEATURES / MAJOR BUG FIXES:
+-none.
+
+NEXT RELEASE PLAN:
+Currently, we only support Gene Ontology (GO) controlled vocabularies with one test type - the hypergeometric test for GO enrichment statistical analysis.  We may include slimmer version of GO terms (GO slim) and chi^2 test as default for GO enrichment analysis in next release.
+
+REQUIREMENT FOR DEPLOYMENT:
 Please refer to readme.txt
