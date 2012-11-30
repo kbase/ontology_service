@@ -11,10 +11,8 @@ use warnings;
 use lib "lib";
 use lib "t/client-tests";
 
-# use Test::More tests => 1;
-use Test::More;
+use Test::More tests => 35;
 use Data::Dumper;
-use String::Random;
 
 my $client;
 my $ret;
@@ -155,12 +153,46 @@ is($max <= $limit_max, 1, "use valid data with limitation (min=$limit_min, max=$
 
 note("Test   getGoDesc");
 
+$go_id1 = 'GO:0006979';
+$go_id2 = 'GO:0055114';
+
+my $desc1 = 'response to oxidative stress';
+my $desc2 = 'oxidation reduction';
+
+# Test - Use valid GO IDs. Expect meaningful description to be returned
+
+$ret = $client->getGoDesc([$go_id1, $go_id2]);
+is($ret->{$go_id1}, $desc1, "get correct description for $go_id1");
+is($ret->{$go_id2}, $desc2, "get correct description for $go_id2");
+
+# Test - Use invalid GO IDs. Expect empty hash
+my @bad_go_ids = ['GO:000697900', 'GO:abcdefg', 'NOT_GO_ID', ''];
+$ret = $client->getGoDesc(\@bad_go_ids);
+is(ref($ret), 'HASH', "use invalid data: getGoDesc returns a hash");
+is(scalar keys %$ret, 0, "use invalid data: getGoDesc returns an empty hash");
+
 
 # 
 #  Method: getGOEnrichment
 #
 
 note("Test   getGOEnrichment");
+my $type1    = 'hypergeometric';
+my $type2    = 'chisq';
+my $bad_type = 'bad_type_string';
+
+$ret = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $type1);
+isnt($ret->[0]->{pvalue}, undef, 'call with valid data returns pvalue');
+
+$ret = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $type2);
+isnt($ret->[1]->{goDesc}, undef, 'call with valid data returns goDesc');
+
+my $ret2 = $client->getGOEnrichment($species, \@genes, [], [], $type2);
+is(@$ret2 >= @$ret, 1, 'call with valid data and no filter returns at least as much data');
+
+# Not sure what the correct behavior should be when a bad type is supplied
+$ret2 = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $bad_type);
+isnt(Dumper($ret2), Dumper($ret), 'call with bad type returns different results');
 
 
 # 
@@ -169,6 +201,25 @@ note("Test   getGOEnrichment");
 
 note("Test   getGOLimitedEnrichment");
 
+$ret = $client->getGOLimitedEnrichment('', \@genes, \@domains, \@ecs, $type1, 0, 10);
+is(ref($ret), 'ARRAY', "use invalid species: getGOLimitedEnrichment returns an array");
+is(scalar@$ret, 0, "use invalid species: getGOLimitedEnrichment returns an empty ARRAY");
+
+$ret = $client->getGOLimitedEnrichment($species, [], \@domains, \@ecs, $type1, 0, 10);
+is(ref($ret), 'ARRAY', "use empty gene list: getGOLimitedEnrichment returns an array");
+is(scalar@$ret, 0, "use empty gene list: getGOLimitedEnrichment returns an empty ARRAY");
+
+eval { $ret = $client->getGOLimitedEnrichment($species, \@genes, \@domains, \@ecs, $type1, 1); };
+isnt($@, undef, 'call with too few parameters failed properly');
+
+$ret = $client->getGOLimitedEnrichment($species, \@genes, \@domains, \@ecs, $type1, 1, 3);
+isnt($ret->[0]->{pvalue}, undef, 'call with reasonable lower/upper bounds returns data');
+
+$ret = $client->getGOLimitedEnrichment($species, \@genes, \@domains, \@ecs, $type1, 1000000, 10);
+isnt(scalar@$ret, 0, 'call with invalid lower/upper bounds returns no data');
+
+$ret = $client->getGOLimitedEnrichment($species, \@genes, \@domains, \@ecs, $type1, 1000000, 1000001);
+isnt(scalar@$ret, 0, 'call with unreasonable lower/upper bounds returns no data');
 
 # Server::stop($pid);
 
