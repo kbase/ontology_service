@@ -25,9 +25,9 @@ SRC_PERL = $(wildcard scripts/*.pl)
 
 # You can change these if you are putting your tests somewhere
 # else or if you are not using the standard .t suffix
-CLIENT_TESTS = $(wildcard client-tests/*.t)
-SCRIPTS_TESTS = $(wildcard script-tests/*.t)
-SERVER_TESTS = $(wildcard server-tests/*.t)
+CLIENT_TESTS = $(wildcard t/client-tests/*.t)
+SCRIPTS_TESTS = $(wildcard t/script-tests/*.t)
+SERVER_TESTS = $(wildcard t/server-tests/*.t)
 
 # This is a very client centric view of release engineering.
 # We assume our primary product for the community is the client
