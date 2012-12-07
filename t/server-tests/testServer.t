@@ -13,7 +13,7 @@ use lib "lib";
 use lib "t/server-tests";
 use OntologyTestConfig qw(getHost getPort);
 
-use Test::More tests => 11;
+use Test::More tests => 37;
 use Data::Dumper;
 
 my $ret;
