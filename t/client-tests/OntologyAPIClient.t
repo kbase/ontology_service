@@ -5,6 +5,7 @@
 #  author:  fangfang
 #  created: 11/30/2012
 # updated 12/6/2012 landml
+# updated 12/7/2012 sjyoo
 
 use strict;
 use warnings;
@@ -123,19 +124,22 @@ is(scalar keys%$ret, 0, "use valid data with limitation (min=0, max=0): hash is 
 
 #  Test - Do the min and max parameters actually filter out invalid cases
 
-my $limit_min = 0;
-my $limit_max = 1;
-$ret = $client->getGOIDLimitedList($species, \@genes, \@domains, \@ecs, $limit_min, $limit_max);
-my $min = 1e9;
-my $max = 0;
-for my $list (values %$ret) {
-    my $n = scalar @$list;
-    $min = $n if $n < $min;
-    $max = $n if $n > $max;
+SKIP: {
+  skip( 'Corrected documentation and thus the test is not valid', 2 );
+  my $limit_min = 0;
+  my $limit_max = 1;
+  $ret = $client->getGOIDLimitedList($species, \@genes, \@domains, \@ecs, $limit_min, $limit_max);
+  my $min = 1e9;
+  my $max = 0;
+  for my $list (values %$ret) {
+      my $n = scalar @$list;
+      $min = $n if $n < $min;
+      $max = $n if $n > $max;
+  }
+  cmp_ok($min, '>=', $limit_min, "use valid data with limitation (min=$limit_min, max=$limit_max): actual min list size >= $limit_min and min=$min");
+  cmp_ok($max, '<=', $limit_max, "use valid data with limitation (min=$limit_min, max=$limit_max): actual max list size <= $limit_max and max=$max");
+  print Dumper(%$ret);
 }
-cmp_ok($min, '>=', $limit_min, "use valid data with limitation (min=$limit_min, max=$limit_max): actual min list size >= $limit_min and min=$min");
-cmp_ok($max, '<=', $limit_max, "use valid data with limitation (min=$limit_min, max=$limit_max): actual max list size <= $limit_max and max=$max");
-print Dumper(%$ret);
 
 # 
 #  Method: getGoDesc
@@ -174,17 +178,20 @@ my $bad_type = 'bad_type_string';
 $ret = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $type1);
 isnt($ret->[0]->{pvalue}, undef, 'call with valid data returns pvalue');
 
-$ret = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $type2);
-isnt($ret->[1]->{goDesc}, undef, 'call with valid data returns goDesc');
+SKIP: {
+  skip( 'not supported in this version', 3 );
+  $ret = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $type2);
+  isnt($ret->[1]->{goDesc}, undef, 'call with valid data returns goDesc');
 
-my $ret2 = $client->getGOEnrichment($species, \@genes, [], [], $type2);
-#is(@$ret2 >= @$ret, 1, 'call with valid data and no filter returns at least as much data');
-cmp_ok(scalar @$ret2, '<=', scalar @$ret, 'call with valid data and no filter returns at least as much data');
+  my $ret2 = $client->getGOEnrichment($species, \@genes, [], [], $type2);
+  #is(@$ret2 >= @$ret, 1, 'call with valid data and no filter returns at least as much data');
+  cmp_ok(scalar @$ret2, '<=', scalar @$ret, 'call with valid data and no filter returns at least as much data');
 
-# Not sure what the correct behavior should be when a bad type is supplied
-$ret2 = undef;
-$ret2 = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $bad_type);
-isnt(Dumper($ret2), Dumper($ret), 'call with bad type returns different results');
+  # Not sure what the correct behavior should be when a bad type is supplied
+  $ret2 = undef;
+  $ret2 = $client->getGOEnrichment($species, \@genes, \@domains, \@ecs, $bad_type);
+  isnt(Dumper($ret2), Dumper($ret), 'call with bad type returns different results');
+}
 
 
 # 
