@@ -3,7 +3,7 @@ use strict;
 use Data::Dumper;
 use Carp;
 use Getopt::Long;
-
+use DBI;
 =head1 NAME
 
 getGOEnrichment - find out enriched GO terms in a set of genes.
@@ -59,15 +59,20 @@ print version information
 
 use Bio::KBase::OntologyService::Client;
 
-my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDs\n";
+my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDs  [--p_value=XXX]\n";
 
 my $host       = "140.221.92.223:7062";
 my $sname      = "Athaliana";
-my $domainList = "biological_process";
-my $ecList     = "IEA";
+#my $domainList = "biological_process";
+#my $ecList     = "IEA";
 my $type       = "hypergeometric";
 my $help       = 0;
 my $version    = 0;
+
+my $domainList="biological_process,molecular_function,cellular_component";
+my $ecList     = "IEA,IDA,IPI,IMP,IGI,IEP,ISS,ISS,ISO,ISA,ISM,IGC,IBA,IBD,IKR,IRD,RCA,TAS,NAS,IC,ND,NR";
+my $pvalue_cutoff="0.05";
+
 
 GetOptions("help"       => \$help,
            "version"    => \$version,
@@ -75,7 +80,9 @@ GetOptions("help"       => \$help,
            "species_name=s"    => \$sname, 
            "domain_list=s" => \$domainList, 
            "evidence_code_list=s" => \$ecList,
-           "test_type=s" => \$type) or die $usage;
+           "test_type=s" => \$type,
+	"p_value=s"=>\$pvalue_cutoff
+) or die $usage;
 
 if($help)
 {
@@ -93,7 +100,7 @@ if($help)
 	print "Examples: \n";
 	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
 	print "\n";
-	print "echo AT1G71695.1 | $0 --evidence_code=IEA \n";
+	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | $0 --evidence_code=IEA --host=x.x.x.x:7062 --p_value=xxx \n";
 	print "\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
@@ -125,6 +132,45 @@ my $istr = join(" ", @input);
 $istr =~ s/[,|]/ /g;
 @input = split /\s+/, $istr;
 my $results = $oc->getGOEnrichment($sname, \@input, \@dl, \@el, $type);
+
+#print "@input\n===\n";
+
+my %tem_gene_hash;
+
 foreach my $hr (@$results) {
-  print $hr->{"goID"}."\t".$hr->{"pvalue"}."\t".$hr->{"goDesc"}."\n";
+
+	next if $hr->{"goID"} !~/GO/;
+	
+	next if  $hr->{"pvalue"} >=  $pvalue_cutoff;
+	print $hr->{"goID"}."\t".$hr->{"pvalue"}."\t".$hr->{"goDesc"}."\t";
+
+
+#get the domain of GO term.
+	my $mygoID=$hr->{"goID"};
+	my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
+	my @mydata = $dbh->selectrow_array("select OntologyDomain from ontologies where SName = '$sname' and  OntologyType = 'GO' and OntologyID='$mygoID' ");
+	print "$mydata[0]\t";
+
+
+#get the gene associated with this GO term
+	foreach my $ggene(@input){
+	my @tem_gene_array;
+	$tem_gene_array[0]=$ggene;
+	my $my_goid_list=$oc->getGOIDList($sname,\@tem_gene_array,\@dl,\@el);
+	my %my_hash=%$my_goid_list;
+	$tem_gene_hash{$ggene}=1 if grep $hr->{"goID"}, @{$my_hash{$ggene}};
+	}
+	my @tem_in;
+	undef @tem_in;
+	foreach my $in(keys %tem_gene_hash){
+		push @tem_in,$in;
+	}
+	undef %tem_gene_hash;
+	my $new_line=join",",@tem_in;
+	print "$new_line\n";
+
 }
+
+
+
+

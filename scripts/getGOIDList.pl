@@ -2,6 +2,8 @@ use strict;
 use Data::Dumper;
 use Carp;
 use Getopt::Long;
+use DBI;
+
 
 =head1 NAME
 
@@ -61,8 +63,13 @@ my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [
 
 my $host       = "140.221.92.223:7062";
 my $sname      = "Athaliana";
-my $domainList = "biological_process";
-my $ecList     = "IEA";
+#my $domainList = ("biological_process","molecular_function","cellular_component");
+#my $ecList     = ("IEA","IDA","IPI","IMP","IGI","IEP","ISS","ISS","ISO","ISA","ISM","IGC","IBA","IBD","IKR","IRD","RCA","TAS","NAS","IC","ND","NR");
+my $domainList="biological_process,molecular_function,cellular_component";
+my $ecList     = "IEA,IDA,IPI,IMP,IGI,IEP,ISS,ISS,ISO,ISA,ISM,IGC,IBA,IBD,IKR,IRD,RCA,TAS,NAS,IC,ND,NR";
+
+
+
 my $help       = 0;
 my $version    = 0;
 
@@ -86,9 +93,9 @@ if($help)
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
+	print "echo AT1G71695.1 | $0 --host=x.x.x.x:7062 \n";
 	print "\n";
-	print "echo AT1G71695.1 | $0 --evidence_code=IEA \n";
+	print "echo AT1G71695.1 | $0 --evidence_code=IEA --host=localhost:7062 \n";
 	print "\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
@@ -122,6 +129,16 @@ $istr =~ s/[,|]/ /g;
 my $results = $oc->getGOIDList($sname, \@input, \@dl, \@el);
 foreach my $geneID (keys %{$results}) {
   foreach my $goID (@{$results->{$geneID}}) {
-    print "$geneID\t$goID\n";
+    print "$geneID\t$goID\t";
+	
+ my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
+ my @mydata = $dbh->selectrow_array("select OntologyDomain,OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = '$geneID' and OntologyType = 'GO' and OntologyID='$goID' ");
+print "$mydata[0]\t$mydata[1]\n";
+
   }
 }
+
+
+
+
+
