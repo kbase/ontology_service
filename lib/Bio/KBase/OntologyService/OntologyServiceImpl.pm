@@ -484,10 +484,6 @@ sub getGOEnrichment
     	my $wholeGeneSize;
 	 $wholeGeneSize = 22000 if $sname=~/Ath/; # temporary... based on gene ID <-- need to be changed...
 	 $wholeGeneSize = 45000 if $sname=~/Ptr/;
-=======
-    
-	my $wholeGeneSize = 22000 if $sname=~/Ath/; # temporary... based on gene ID <-- need to be changed...
-	my $wholeGeneSize = 45000 if $sname=~/Ptr/;
 >>>>>>> 23f7a1aefcbb81807765f81d47339e5564fd8d0c
 	 # calc p-value using any h.g. test
       my %rst = ();
