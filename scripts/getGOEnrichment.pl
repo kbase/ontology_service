@@ -135,7 +135,6 @@ my $results = $oc->getGOEnrichment($sname, \@input, \@dl, \@el, $type);
 
 #print "@input\n===\n";
 
-my %tem_gene_hash;
 
 foreach my $hr (@$results) {
 
@@ -144,29 +143,33 @@ foreach my $hr (@$results) {
 	next if  $hr->{"pvalue"} >=  $pvalue_cutoff;
 	print $hr->{"goID"}."\t".$hr->{"pvalue"}."\t".$hr->{"goDesc"}."\t";
 
-
+my $go_id=$hr->{"goID"};
 #get the domain of GO term.
-	my $mygoID=$hr->{"goID"};
-	my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
-	my @mydata = $dbh->selectrow_array("select OntologyDomain from ontologies where SName = '$sname' and  OntologyType = 'GO' and OntologyID='$mygoID' ");
-	print "$mydata[0]\t";
+#	my $mygoID=$hr->{"goID"};
+#	my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
+#	my @mydata = $dbh->selectrow_array("select OntologyDomain from ontologies where SName = '$sname' and  OntologyType = 'GO' and OntologyID='$mygoID' ");
+#	print "$mydata[0]\t";
 
-
+	my %tem_gene_hash;
 #get the gene associated with this GO term
+	undef (%tem_gene_hash);
+
 	foreach my $ggene(@input){
 	my @tem_gene_array;
 	$tem_gene_array[0]=$ggene;
 	my $my_goid_list=$oc->getGOIDList($sname,\@tem_gene_array,\@dl,\@el);
 	my %my_hash=%$my_goid_list;
-	$tem_gene_hash{$ggene}=1 if grep $hr->{"goID"}, @{$my_hash{$ggene}};
+	$tem_gene_hash{$ggene}=1 if grep /$go_id/, @{$my_hash{$ggene}};
 	}
+
+
 	my @tem_in;
 	undef @tem_in;
 	foreach my $in(keys %tem_gene_hash){
 		push @tem_in,$in;
 	}
-	undef %tem_gene_hash;
 	my $new_line=join",",@tem_in;
+	
 	print "$new_line\n";
 
 }

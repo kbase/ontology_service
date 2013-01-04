@@ -129,11 +129,11 @@ $istr =~ s/[,|]/ /g;
 my $results = $oc->getGOIDList($sname, \@input, \@dl, \@el);
 foreach my $geneID (keys %{$results}) {
   foreach my $goID (@{$results->{$geneID}}) {
-    print "$geneID\t$goID\t";
+    print "$geneID\t$goID\n";
 	
- my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
- my @mydata = $dbh->selectrow_array("select OntologyDomain,OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = '$geneID' and OntologyType = 'GO' and OntologyID='$goID' ");
-print "$mydata[0]\t$mydata[1]\n";
+# my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
+# my @mydata = $dbh->selectrow_array("select OntologyDomain,OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = '$geneID' and OntologyType = 'GO' and OntologyID='$goID' ");
+#print "$mydata[0]\t$mydata[1]\n";
 
   }
 }
