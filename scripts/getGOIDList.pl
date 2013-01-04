@@ -97,6 +97,7 @@ if($help)
 	print "\n";
 	print "echo AT1G71695.1 | $0 --evidence_code=IEA --host=localhost:7062 \n";
 	print "\n";
+	print "echo AT1G03010.1,AT1G02830.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOIDList.pl  --host=localhost:7062\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
 	print "$0 --version\tprint out version information\n";
@@ -129,11 +130,11 @@ $istr =~ s/[,|]/ /g;
 my $results = $oc->getGOIDList($sname, \@input, \@dl, \@el);
 foreach my $geneID (keys %{$results}) {
   foreach my $goID (@{$results->{$geneID}}) {
-    print "$geneID\t$goID\t";
+    print "$geneID\t$goID\n";
 	
- my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
- my @mydata = $dbh->selectrow_array("select OntologyDomain,OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = '$geneID' and OntologyType = 'GO' and OntologyID='$goID' ");
-print "$mydata[0]\t$mydata[1]\n";
+# my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev','');
+# my @mydata = $dbh->selectrow_array("select OntologyDomain,OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = '$geneID' and OntologyType = 'GO' and OntologyID='$goID' ");
+#print "$mydata[0]\t$mydata[1]\n";
 
   }
 }
