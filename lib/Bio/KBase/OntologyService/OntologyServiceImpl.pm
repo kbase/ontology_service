@@ -480,9 +480,15 @@ sub getGOEnrichment
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
+<<<<<<< HEAD
     	my $wholeGeneSize;
 	 $wholeGeneSize = 22000 if $sname=~/Ath/; # temporary... based on gene ID <-- need to be changed...
 	 $wholeGeneSize = 45000 if $sname=~/Ptr/;
+=======
+    
+	my $wholeGeneSize = 22000 if $sname=~/Ath/; # temporary... based on gene ID <-- need to be changed...
+	my $wholeGeneSize = 45000 if $sname=~/Ptr/;
+>>>>>>> 23f7a1aefcbb81807765f81d47339e5564fd8d0c
 	 # calc p-value using any h.g. test
       my %rst = ();
       $rst{"pvalue"} = calculateStatistic(n11 => $ukey{$goIDList[$i]}, n1p => $geneSize, np1 => $goSize, npp => $wholeGeneSize);
