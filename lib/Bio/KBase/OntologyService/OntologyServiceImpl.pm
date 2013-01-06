@@ -338,8 +338,10 @@ sub getGoDesc
     my %go2desc = (); # gene to id list
     $results = \%go2desc;
     my $pstmt = $dbh->prepare("select OntologyDescription, OntologyDomain from ontologies where OntologyID = ? and OntologyType = 'GO'");
-    foreach my $goID (@{$goIDList}) {
-
+my @tm_goID;	
+ foreach my $goID (@{$goIDList}) {
+	@tm_goID=split/\t/,$goID;
+	$goID=$tm_goID[0];
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();
       while( my @data = $pstmt->fetchrow_array()) {

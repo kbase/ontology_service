@@ -93,6 +93,24 @@ my $istr = join(" ", @input);
 $istr =~ s/[,|]/ /g;
 @input = split /\s+/, $istr;
 my $results = $oc->getGoDesc(\@input);
+my $i;
+my @tem;
+for  ($i=0;$i<@input;$i=$i+4){
+#print "$input[$i]\n";
+push @tem,$input[$i];
+}
+my %hash;
+my @temm;
+foreach my $in(keys %{$results}){
+push @temm,$in;
+}
+for($i=0;$i<@temm;$i++){
+$hash{$temm[$i]}=$tem[$i];
+}
+
+
+
 foreach my $goID (keys %{$results}) {
-  print "$goID\t".$results->{"$goID"}."\n";
+  print "$hash{$goID}\t$goID\t".$results->{"$goID"}."\n";
+
 }

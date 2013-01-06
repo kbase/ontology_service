@@ -17,8 +17,12 @@ except ImportError:
     sys.path.append('simplejson-2.3.3')
     import simplejson as json
     
-import urllib2, httplib
-from urllib2 import URLError
+import urllib2, httplib, urlparse
+from urllib2 import URLError, HTTPError
+
+_CT = 'content-type'
+_AJ = 'application/json'
+_URL_SCHEME = frozenset(['http', 'https']) 
 
 class ServerError(Exception):
 
@@ -33,8 +37,12 @@ class ServerError(Exception):
 class Ontology:
 
     def __init__(self, url, timeout = 30 * 60):
-        if url != None:
-            self.url = url
+        if url is None:
+            raise ValueError('A url is required')
+        scheme, _, _, _, _, _ = urlparse.urlparse(url)
+        if scheme not in _URL_SCHEME:
+            raise ValueError(url + " isn't a valid http url")
+        self.url = url
         self.timeout = int(timeout)
         if self.timeout < 1:
             raise ValueError('Timeout value must be at least 1 second')
@@ -47,15 +55,23 @@ class Ontology:
                      }
 
         body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        try:
+            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        except HTTPError as h:
+            if _CT in h.headers and h.headers[_CT] == _AJ:
+        		    err = json.loads(h.read()) 
+        		    if 'error' in err:
+        			     raise ServerError(**err['error'])
+        		    else: 			   #this should never happen... if it does 
+        			     raise h     #  h.read() will return '' in the calling code.
+            else:
+        		    raise h
         if ret.code != httplib.OK:
             raise URLError('Received bad response code from server:' + ret.code)
         resp = json.loads(ret.read())
 
         if 'result' in resp:
             return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
@@ -67,15 +83,23 @@ class Ontology:
                      }
 
         body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        try:
+            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        except HTTPError as h:
+            if _CT in h.headers and h.headers[_CT] == _AJ:
+        		    err = json.loads(h.read()) 
+        		    if 'error' in err:
+        			     raise ServerError(**err['error'])
+        		    else: 			   #this should never happen... if it does 
+        			     raise h     #  h.read() will return '' in the calling code.
+            else:
+        		    raise h
         if ret.code != httplib.OK:
             raise URLError('Received bad response code from server:' + ret.code)
         resp = json.loads(ret.read())
 
         if 'result' in resp:
             return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
@@ -87,15 +111,23 @@ class Ontology:
                      }
 
         body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        try:
+            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        except HTTPError as h:
+            if _CT in h.headers and h.headers[_CT] == _AJ:
+        		    err = json.loads(h.read()) 
+        		    if 'error' in err:
+        			     raise ServerError(**err['error'])
+        		    else: 			   #this should never happen... if it does 
+        			     raise h     #  h.read() will return '' in the calling code.
+            else:
+        		    raise h
         if ret.code != httplib.OK:
             raise URLError('Received bad response code from server:' + ret.code)
         resp = json.loads(ret.read())
 
         if 'result' in resp:
             return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
@@ -107,15 +139,23 @@ class Ontology:
                      }
 
         body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        try:
+            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        except HTTPError as h:
+            if _CT in h.headers and h.headers[_CT] == _AJ:
+        		    err = json.loads(h.read()) 
+        		    if 'error' in err:
+        			     raise ServerError(**err['error'])
+        		    else: 			   #this should never happen... if it does 
+        			     raise h     #  h.read() will return '' in the calling code.
+            else:
+        		    raise h
         if ret.code != httplib.OK:
             raise URLError('Received bad response code from server:' + ret.code)
         resp = json.loads(ret.read())
 
         if 'result' in resp:
             return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
@@ -127,15 +167,23 @@ class Ontology:
                      }
 
         body = json.dumps(arg_hash)
-        ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        try:
+            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
+        except HTTPError as h:
+            if _CT in h.headers and h.headers[_CT] == _AJ:
+        		    err = json.loads(h.read()) 
+        		    if 'error' in err:
+        			     raise ServerError(**err['error'])
+        		    else: 			   #this should never happen... if it does 
+        			     raise h     #  h.read() will return '' in the calling code.
+            else:
+        		    raise h
         if ret.code != httplib.OK:
             raise URLError('Received bad response code from server:' + ret.code)
         resp = json.loads(ret.read())
 
         if 'result' in resp:
             return resp['result'][0]
-        elif 'error' in resp:
-            raise ServerError(**resp['error'])
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
