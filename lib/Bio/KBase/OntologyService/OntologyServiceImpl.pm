@@ -144,7 +144,7 @@ sub getGOIDList
         next if ! defined $domainMap{$data[2]};
         next if ! defined $ecMap{$data[3]};
         $g2idlist{$geneID} = [] if(! defined $g2idlist{$geneID}) ;
-        push $g2idlist{$geneID}, $data[0]."\t".$data[2]."\t".$data[3];
+        push $g2idlist{$geneID}, $data[0]."\t".$data[2]."\t".$data[3]."\t".$data[1];
       } # end of fetch and counting
     } # end of types
 
@@ -338,8 +338,10 @@ sub getGoDesc
     my %go2desc = (); # gene to id list
     $results = \%go2desc;
     my $pstmt = $dbh->prepare("select OntologyDescription, OntologyDomain from ontologies where OntologyID = ? and OntologyType = 'GO'");
-    foreach my $goID (@{$goIDList}) {
-
+my @tm_goID;	
+ foreach my $goID (@{$goIDList}) {
+	@tm_goID=split/\t/,$goID;
+	$goID=$tm_goID[0];
       $pstmt->bind_param(1, $goID);
       $pstmt->execute();
       while( my @data = $pstmt->fetchrow_array()) {
