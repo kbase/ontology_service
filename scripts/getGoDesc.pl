@@ -95,6 +95,7 @@ $istr =~ s/[,|]/ /g;
 my $results = $oc->getGoDesc(\@input);
 my $i;
 my @tem;
+<<<<<<< HEAD
 #for  ($i=0;$i<@input;$i=$i+4){
 ##print "$input[$i]\n";
 #push @tem,$input[$i];
@@ -107,10 +108,28 @@ my @tem;
 #for($i=0;$i<@temm;$i++){
 #$hash{$temm[$i]}=$tem[$i];
 #}
+=======
+for  ($i=0;$i<@input;$i=$i+4){
+#print "$input[$i]\n";
+push @tem,$input[$i];
+}
+my %hash;
+my @temm;
+foreach my $in(keys %{$results}){
+push @temm,$in;
+}
+for($i=0;$i<@temm;$i++){
+$hash{$temm[$i]}=$tem[$i];
+}
+>>>>>>> f267d542ca8c89546cf6a9cfbc7c7efe28fb08b7
 
 
 
 foreach my $goID (keys %{$results}) {
+<<<<<<< HEAD
   print "$goID\t".$results->{"$goID"}."\n";
+=======
+  print "$hash{$goID}\t$goID\t".$results->{"$goID"}."\n";
+>>>>>>> f267d542ca8c89546cf6a9cfbc7c7efe28fb08b7
 
 }

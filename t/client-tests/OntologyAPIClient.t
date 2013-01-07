@@ -65,9 +65,9 @@ note("Test   getGOIDlist");
 #  Test - Use valid data. Expect hash with data to be returned
 
 my $species = "Athaliana";
-my @genes   = qw(AT1G71695.1);
-my @domains = qw(biological_process);
-my @ecs     = qw(IEA);
+my @genes   = qw(AT1G71695.1 At1G36180.1 AT1G01920.2 AT1G01930.1 AT1G01940.1 AT1G01950.1 AT1G01960.1 AT2G01720.1 AT2G01730.1 AT2G01740.1 AT2G01750.1 );
+my @domains = qw(biological_process molecular_function cellular_component);
+my @ecs     = qw(IEA TAS NAS EXP IDA IPI ISS);
 
 $ret = $client->getGOIDList($species, \@genes, \@domains, \@ecs);
 is(ref($ret), 'HASH', "use valid data: getGOIDList returns a hash");
@@ -156,8 +156,8 @@ my $desc2 = 'oxidation reduction';
 # Test - Use valid GO IDs. Expect meaningful description to be returned
 
 $ret = $client->getGoDesc([$go_id1, $go_id2]);
-is($ret->{$go_id1}, $desc1, "get correct description for $go_id1");
-is($ret->{$go_id2}, $desc2, "get correct description for $go_id2");
+ok($ret->{$go_id1} =~ /$desc1/, "get correct description for $go_id1");
+ok($ret->{$go_id2} =~ /$desc2/, "get correct description for $go_id2");
 
 # Test - Use invalid GO IDs. Expect empty hash
 my @bad_go_ids = ['GO:000697900', 'GO:abcdefg', 'NOT_GO_ID', ''];
