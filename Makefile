@@ -139,7 +139,7 @@ test-service:
 # of the server and it's related architecture. For illustrative
 # purposes, we include the dependency in the deploy target as we
 # prefer this when it is reasonable."
-deploy: deploy-client
+deploy: deploy-client deploy-service
 deploy-all: deploy-client deploy-service
 
 #
