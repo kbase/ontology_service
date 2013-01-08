@@ -19,7 +19,7 @@ output is to the standard output.
 
 =head2 Documentation for underlying call
 
-Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (one go-id per line) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
+Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (white space or comman separated) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
 
 =head1 OPTIONS
 
@@ -38,7 +38,7 @@ print version information
 
 =head1 SEE ALSO
 
-L<getGOIDList(1)>, L<getGOIDLimitedList(1)> 
+L<getGOIDList(1)>
 =cut
 
 use Bio::KBase::OntologyService::Client;
