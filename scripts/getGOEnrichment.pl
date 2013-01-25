@@ -62,7 +62,7 @@ use Bio::KBase::OntologyService::Client;
 my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDs  [--p_value=XXX]\n";
 
 my $host       = "140.221.92.223:7062";
-my $sname      = "Athaliana";
+my $sname      = "Athaliana" ;
 #my $domainList = "biological_process";
 #my $ecList     = "IEA";
 my $type       = "hypergeometric";
@@ -77,7 +77,7 @@ my $pvalue_cutoff="0.05";
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "host=s"     => \$host, 
-           "species_name=s"    => \$sname, 
+        #   "species_name=s"    => \$sname, 
            "domain_list=s" => \$domainList, 
            "evidence_code_list=s" => \$ecList,
            "test_type=s" => \$type,
@@ -99,10 +99,11 @@ if($help)
 	print "\n";
 	print "Examples: \n";
 	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
-	print "\n";
-	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | $0 --evidence_code=IEA --host=x.x.x.x:7062 --p_value=xxx \n";
-	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOEnrichment.pl --p_value=0.05  --host=localhost:7062";
-	print "\n";
+	print "\n\n";
+	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'|perl scripts/getGOEnrichment.pl --host=localhost:7062";
+#	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | $0 --evidence_code=IEA --host=x.x.x.x:7062 --p_value=xxx \n";
+#	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOEnrichment.pl --p_value=0.05  --host=localhost:7062";
+	print "\n\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
 	print "$0 --version\tprint out version information\n";
@@ -130,8 +131,11 @@ my @dl = split/,/, $domainList;
 my @el = split/,/, $ecList;
 my @input = <STDIN>;
 my $istr = join(" ", @input);
-$istr =~ s/[,|]/ /g;
+$istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
+$sname="Athaliana" if $istr =~/3899/;
+$sname="Ptrichocarpa" if $istr =~/3907/;
+
 my $results = $oc->getGOEnrichment($sname, \@input, \@dl, \@el, $type);
 
 #print "@input\n===\n";

@@ -14,10 +14,8 @@ our $CallContext;
 
 our %return_counts = (
         'getGOIDList' => 1,
-        'getGOIDLimitedList' => 1,
         'getGoDesc' => 1,
         'getGOEnrichment' => 1,
-        'getGOLimitedEnrichment' => 1,
         'version' => 1,
 );
 
@@ -28,10 +26,8 @@ sub _build_valid_methods
     my($self) = @_;
     my $methods = {
         'getGOIDList' => 1,
-        'getGOIDLimitedList' => 1,
         'getGoDesc' => 1,
         'getGOEnrichment' => 1,
-        'getGOLimitedEnrichment' => 1,
         'version' => 1,
     };
     return $methods;

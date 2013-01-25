@@ -111,7 +111,7 @@ GoDesc is a string
 
 =item Description
 
-For a given list of Features (aka Genes) from a particular genome (for example "Athaliana" Arabidopsis thaliana ) extract corresponding list of GO identifiers. This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
+For a given list of Features (aka Genes) from a particular genome (for example "Athaliana" Arabidopsis thaliana ) extract corresponding list of GO identifiers. This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids.
 
 =back
 
@@ -147,8 +147,8 @@ sub getGOIDList
 
     my %g2idlist = (); # gene to id list
     $results = \%g2idlist;
-    my $pstmt_apr = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID like ? and OntologyType = 'GO'");
-    my $pstmt_exc = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies where SName = '$sname' and TranscriptID = ? and OntologyType = 'GO'");
+    my $pstmt_apr = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies_int where kblocusid like ? and OntologyType = 'GO'");
+    my $pstmt_exc = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies_int where kblocusid = ? and OntologyType = 'GO'");
     my $pstmt;
     foreach my $geneID (@{$geneIDList}) {
 
@@ -253,7 +253,7 @@ sub getGoDesc
 
     my %go2desc = (); # gene to id list
     $results = \%go2desc;
-    my $pstmt = $dbh->prepare("select OntologyDescription, OntologyDomain from ontologies where OntologyID = ? and OntologyType = 'GO'");
+    my $pstmt = $dbh->prepare("select OntologyDescription, OntologyDomain from ontologies_int where OntologyID = ? and OntologyType = 'GO'");
 my @tm_goID;	
  foreach my $goID (@{$goIDList}) {
 	@tm_goID=split/\t/,$goID;
@@ -348,7 +348,7 @@ GoDesc is a string
 
 For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test.
 
-Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
+Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. Also, if no species name is provided then Athaliana is used as the default species.
 
 =back
 
@@ -374,7 +374,7 @@ sub getGOEnrichment
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN getGOEnrichment
-    my $frst = getGOIDList($self, $sname, $geneIDList, $domainList, $ecList);
+    my $frst = getGOIDList($self,$sname, $geneIDList, $domainList, $ecList);
     my %ukey = ();
    my @tem_goID=();
 	foreach my $geneID (keys %{$frst}) {

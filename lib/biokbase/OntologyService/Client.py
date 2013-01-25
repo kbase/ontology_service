@@ -75,34 +75,6 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def getGOIDLimitedList(self, sname, geneIDList, domainList, ecList, minCount, maxCount):
-
-        arg_hash = { 'method': 'Ontology.getGOIDLimitedList',
-                     'params': [sname, geneIDList, domainList, ecList, minCount, maxCount],
-                     'version': '1.1'
-                     }
-
-        body = json.dumps(arg_hash)
-        try:
-            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
-        except HTTPError as h:
-            if _CT in h.headers and h.headers[_CT] == _AJ:
-        		    err = json.loads(h.read()) 
-        		    if 'error' in err:
-        			     raise ServerError(**err['error'])
-        		    else: 			   #this should never happen... if it does 
-        			     raise h     #  h.read() will return '' in the calling code.
-            else:
-        		    raise h
-        if ret.code != httplib.OK:
-            raise URLError('Received bad response code from server:' + ret.code)
-        resp = json.loads(ret.read())
-
-        if 'result' in resp:
-            return resp['result'][0]
-        else:
-            raise ServerError('Unknown', 0, 'An unknown server error occurred')
-
     def getGoDesc(self, goIDList):
 
         arg_hash = { 'method': 'Ontology.getGoDesc',
@@ -135,34 +107,6 @@ class Ontology:
 
         arg_hash = { 'method': 'Ontology.getGOEnrichment',
                      'params': [sname, geneIDList, domainList, ecList, type],
-                     'version': '1.1'
-                     }
-
-        body = json.dumps(arg_hash)
-        try:
-            ret = urllib2.urlopen(self.url, body, timeout = self.timeout)
-        except HTTPError as h:
-            if _CT in h.headers and h.headers[_CT] == _AJ:
-        		    err = json.loads(h.read()) 
-        		    if 'error' in err:
-        			     raise ServerError(**err['error'])
-        		    else: 			   #this should never happen... if it does 
-        			     raise h     #  h.read() will return '' in the calling code.
-            else:
-        		    raise h
-        if ret.code != httplib.OK:
-            raise URLError('Received bad response code from server:' + ret.code)
-        resp = json.loads(ret.read())
-
-        if 'result' in resp:
-            return resp['result'][0]
-        else:
-            raise ServerError('Unknown', 0, 'An unknown server error occurred')
-
-    def getGOLimitedEnrichment(self, sname, geneIDList, domainList, ecList, minCount, maxCount, type):
-
-        arg_hash = { 'method': 'Ontology.getGOLimitedEnrichment',
-                     'params': [sname, geneIDList, domainList, ecList, minCount, maxCount, type],
                      'version': '1.1'
                      }
 

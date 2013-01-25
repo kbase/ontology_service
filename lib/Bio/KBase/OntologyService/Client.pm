@@ -59,7 +59,7 @@ $sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
-$results is a GeneIDMap2GoIDList
+$results is a GeneIDMap2GoInfo
 Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -67,9 +67,15 @@ DomainList is a reference to a list where each element is a Domain
 Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
+GeneIDMap2GoInfo is a reference to a hash where the key is a GeneID and the value is a GoIDMap2GoTermInfo
+GoIDMap2GoTermInfo is a reference to a hash where the key is a GoID and the value is a GoTermInfoList
 GoID is a string
+GoTermInfoList is a reference to a list where each element is a GoTermInfo
+GoTermInfo is a reference to a hash where the following keys are defined:
+	domain has a value which is a Domain
+	ec has a value which is an EvidenceCode
+	desc has a value which is a GoDesc
+GoDesc is a string
 
 </pre>
 
@@ -81,7 +87,7 @@ $sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
-$results is a GeneIDMap2GoIDList
+$results is a GeneIDMap2GoInfo
 Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -89,16 +95,22 @@ DomainList is a reference to a list where each element is a Domain
 Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
+GeneIDMap2GoInfo is a reference to a hash where the key is a GeneID and the value is a GoIDMap2GoTermInfo
+GoIDMap2GoTermInfo is a reference to a hash where the key is a GoID and the value is a GoTermInfoList
 GoID is a string
+GoTermInfoList is a reference to a list where each element is a GoTermInfo
+GoTermInfo is a reference to a hash where the following keys are defined:
+	domain has a value which is a Domain
+	ec has a value which is an EvidenceCode
+	desc has a value which is a GoDesc
+GoDesc is a string
 
 
 =end text
 
 =item Description
 
-For a given list of Features (aka Genes) from a particular genome (for example "Athaliana" Arabidopsis thaliana ) extract corresponding list of GO identifiers. This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
+For a given list of Features (aka Genes) from a particular genome (for example "Athaliana" Arabidopsis thaliana ) extract corresponding list of GO identifiers. This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids.
 
 =back
 
@@ -153,121 +165,6 @@ sub getGOIDList
 
 
 
-=head2 getGOIDLimitedList
-
-  $results = $obj->getGOIDLimitedList($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$results is a GeneIDMap2GoIDList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$results is a GeneIDMap2GoIDList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-GeneIDMap2GoIDList is a reference to a hash where the key is a GeneID and the value is a GoIDList
-GoIDList is a reference to a list where each element is a GoID
-GoID is a string
-
-
-=end text
-
-=item Description
-
-For a given list of Features from a particular genome (for example "Athaliana") extract corresponding list of GO identifiers. This function call accepts six parameters: species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and lower & upper bound on the number of returned go-ids that a gene-id must have. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the domain and the evidence-code lists is not empty then the gene-id and go-ids pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results  then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of only those gene-id to go-ids for which the count of genes per go-id is between minimum and maximum count limit. Note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, a note on the input list: only one item per line is allowed.
-
-=back
-
-=cut
-
-sub getGOIDLimitedList
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 6)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function getGOIDLimitedList (received $n, expecting 6)");
-    }
-    {
-	my($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount) = @args;
-
-	my @_bad_arguments;
-        (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument 1 \"sname\" (value was \"$sname\")");
-        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"geneIDList\" (value was \"$geneIDList\")");
-        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"domainList\" (value was \"$domainList\")");
-        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
-        (!ref($minCount)) or push(@_bad_arguments, "Invalid type for argument 5 \"minCount\" (value was \"$minCount\")");
-        (!ref($maxCount)) or push(@_bad_arguments, "Invalid type for argument 6 \"maxCount\" (value was \"$maxCount\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to getGOIDLimitedList:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'getGOIDLimitedList');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "Ontology.getGOIDLimitedList",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'getGOIDLimitedList',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method getGOIDLimitedList",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'getGOIDLimitedList',
-				       );
-    }
-}
-
-
-
 =head2 getGoDesc
 
   $results = $obj->getGoDesc($goIDList)
@@ -280,9 +177,10 @@ sub getGOIDLimitedList
 
 <pre>
 $goIDList is a GoIDList
-$results is a reference to a hash where the key is a GoID and the value is a string
+$results is a reference to a hash where the key is a GoID and the value is a StringArray
 GoIDList is a reference to a list where each element is a GoID
 GoID is a string
+StringArray is a reference to a list where each element is a string
 
 </pre>
 
@@ -291,9 +189,10 @@ GoID is a string
 =begin text
 
 $goIDList is a GoIDList
-$results is a reference to a hash where the key is a GoID and the value is a string
+$results is a reference to a hash where the key is a GoID and the value is a StringArray
 GoIDList is a reference to a list where each element is a GoID
 GoID is a string
+StringArray is a reference to a list where each element is a string
 
 
 =end text
@@ -420,7 +319,7 @@ GoDesc is a string
 
 For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains, a list of evidence codes, and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test.
 
-Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
+Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. Also, if no species name is provided then Athaliana is used as the default species.
 
 =back
 
@@ -476,144 +375,6 @@ sub getGOEnrichment
 
 
 
-=head2 getGOLimitedEnrichment
-
-  $results = $obj->getGOLimitedEnrichment($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount, $type)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$type is a TestType
-$results is an EnrichmentList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-TestType is a string
-EnrichmentList is a reference to a list where each element is an Enrichment
-Enrichment is a reference to a hash where the following keys are defined:
-	goID has a value which is a GoID
-	goDesc has a value which is a GoDesc
-	pvalue has a value which is a float
-GoID is a string
-GoDesc is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$sname is a Species
-$geneIDList is a GeneIDList
-$domainList is a DomainList
-$ecList is an EvidenceCodeList
-$minCount is an int
-$maxCount is an int
-$type is a TestType
-$results is an EnrichmentList
-Species is a string
-GeneIDList is a reference to a list where each element is a GeneID
-GeneID is a string
-DomainList is a reference to a list where each element is a Domain
-Domain is a string
-EvidenceCodeList is a reference to a list where each element is an EvidenceCode
-EvidenceCode is a string
-TestType is a string
-EnrichmentList is a reference to a list where each element is an Enrichment
-Enrichment is a reference to a hash where the following keys are defined:
-	goID has a value which is a GoID
-	goDesc has a value which is a GoDesc
-	pvalue has a value which is a float
-GoID is a string
-GoDesc is a string
-
-
-=end text
-
-=item Description
-
-For a given list of Features from a particular genome (for example Arabidopsis thaliana) find out the significantly enriched GO 
-terms in your feature-set. This function accepts seven parameters: Specie name, a list of gene-identifiers, a list of ontology domains,
-    a list of evidence codes, lower & upper bound on the number of returned go-ids that a gene-id must have, and ontology 
-    type (e.g. GO, PO, EO, TO etc). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of 
-    evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are 
-    further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the 
-    initial results then it is recommended to provide empty domain and evidence code lists. In any case, a mapping of only those 
-    gene-id to go-ids for which the count of genes per go-id is between minimum and maximum count limit is carried forward. Final filtered 
-    list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric test.
-
-Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
-
-=back
-
-=cut
-
-sub getGOLimitedEnrichment
-{
-    my($self, @args) = @_;
-
-# Authentication: none
-
-    if ((my $n = @args) != 7)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function getGOLimitedEnrichment (received $n, expecting 7)");
-    }
-    {
-	my($sname, $geneIDList, $domainList, $ecList, $minCount, $maxCount, $type) = @args;
-
-	my @_bad_arguments;
-        (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument 1 \"sname\" (value was \"$sname\")");
-        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"geneIDList\" (value was \"$geneIDList\")");
-        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"domainList\" (value was \"$domainList\")");
-        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
-        (!ref($minCount)) or push(@_bad_arguments, "Invalid type for argument 5 \"minCount\" (value was \"$minCount\")");
-        (!ref($maxCount)) or push(@_bad_arguments, "Invalid type for argument 6 \"maxCount\" (value was \"$maxCount\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 7 \"type\" (value was \"$type\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to getGOLimitedEnrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'getGOLimitedEnrichment');
-	}
-    }
-
-    my $result = $self->{client}->call($self->{url}, {
-	method => "Ontology.getGOLimitedEnrichment",
-	params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
-					       method_name => 'getGOLimitedEnrichment',
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method getGOLimitedEnrichment",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'getGOLimitedEnrichment',
-				       );
-    }
-}
-
-
-
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -625,16 +386,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'getGOLimitedEnrichment',
+                method_name => 'getGOEnrichment',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method getGOLimitedEnrichment",
+            error => "Error invoking method getGOEnrichment",
             status_line => $self->{client}->status_line,
-            method_name => 'getGOLimitedEnrichment',
+            method_name => 'getGOEnrichment',
         );
     }
 }
@@ -1062,6 +823,32 @@ a reference to a list where each element is a Domain
 
 
 
+=head2 StringArray
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
 =head2 EvidenceCodeList
 
 =over 4
@@ -1093,15 +880,10 @@ a reference to a list where each element is an EvidenceCode
 
 
 
-=head2 GeneIDMap2GoIDList
+=head2 GoTermInfo
 
 =over 4
 
-
-
-=item Description
-
-A list of gene-id to go-id mappings. One gene-id can have one or more go-ids associated with it.
 
 
 =item Definition
@@ -1109,14 +891,100 @@ A list of gene-id to go-id mappings. One gene-id can have one or more go-ids ass
 =begin html
 
 <pre>
-a reference to a hash where the key is a GeneID and the value is a GoIDList
+a reference to a hash where the following keys are defined:
+domain has a value which is a Domain
+ec has a value which is an EvidenceCode
+desc has a value which is a GoDesc
+
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the key is a GeneID and the value is a GoIDList
+a reference to a hash where the following keys are defined:
+domain has a value which is a Domain
+ec has a value which is an EvidenceCode
+desc has a value which is a GoDesc
+
+
+=end text
+
+=back
+
+
+
+=head2 GoTermInfoList
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a GoTermInfo
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a GoTermInfo
+
+=end text
+
+=back
+
+
+
+=head2 GoIDMap2GoTermInfo
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a GoID and the value is a GoTermInfoList
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a GoID and the value is a GoTermInfoList
+
+=end text
+
+=back
+
+
+
+=head2 GeneIDMap2GoInfo
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a GeneID and the value is a GoIDMap2GoTermInfo
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a GeneID and the value is a GoIDMap2GoTermInfo
 
 =end text
 
