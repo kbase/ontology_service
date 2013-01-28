@@ -133,8 +133,8 @@ my @input = <STDIN>;
 my $istr = join(" ", @input);
 $istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
-$sname="Athaliana" if $istr =~/3899/;
-$sname="Ptrichocarpa" if $istr =~/3907/;
+$sname="Athaliana" if $istr =~/g\.3899/;
+$sname="Ptrichocarpa" if $istr =~/g.\3907/;
 
 
 
