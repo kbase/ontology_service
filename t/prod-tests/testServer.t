@@ -55,7 +55,7 @@ note("Test   getGOIDlist");
 #  Test - Use valid data. Expect hash with data to be returned
 
 my $species = "Athaliana";
-my @genes   = qw(AT1G71695.1 At1G36180.1 AT1G01920.2 AT1G01930.1 AT1G01940.1 AT1G01950.1 AT1G01960.1 AT2G01720.1 AT2G01730.1 AT2G01740.1 AT2G01750.1 );
+my @genes   = qw(kb|g.3899.locus.192 kb|g.3899.locus.164);
 my @domains = qw(biological_process molecular_function cellular_component);
 my @ecs     = qw(IEA TAS NAS EXP IDA IPI ISS);
 
@@ -114,7 +114,7 @@ my $go_id1 = 'GO:0006979';
 my $go_id2 = 'GO:0055114';
 
 my $desc1 = 'response to oxidative stress';
-my $desc2 = 'oxidation reduction';
+my $desc2 = 'oxidation-reduction process';
 
 # Test - Use valid GO IDs. Expect meaningful description to be returned
 
