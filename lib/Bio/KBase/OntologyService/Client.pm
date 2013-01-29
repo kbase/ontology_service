@@ -44,9 +44,9 @@ sub new
 
 
 
-=head2 getGOIDList
+=head2 get_goidlist
 
-  $results = $obj->getGOIDList($sname, $geneIDList, $domainList, $ecList)
+  $results = $obj->get_goidlist($sname, $geneIDList, $domainList, $ecList)
 
 =over 4
 
@@ -116,7 +116,7 @@ For a given list of Features (aka Genes) from a particular genome (for example "
 
 =cut
 
-sub getGOIDList
+sub get_goidlist
 {
     my($self, @args) = @_;
 
@@ -125,7 +125,7 @@ sub getGOIDList
     if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function getGOIDList (received $n, expecting 4)");
+							       "Invalid argument count for function get_goidlist (received $n, expecting 4)");
     }
     {
 	my($sname, $geneIDList, $domainList, $ecList) = @args;
@@ -136,38 +136,38 @@ sub getGOIDList
         (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"domainList\" (value was \"$domainList\")");
         (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to getGOIDList:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_goidlist:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'getGOIDList');
+								   method_name => 'get_goidlist');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "Ontology.getGOIDList",
+	method => "Ontology.get_goidlist",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'getGOIDList',
+					       method_name => 'get_goidlist',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method getGOIDList",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_goidlist",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'getGOIDList',
+					    method_name => 'get_goidlist',
 				       );
     }
 }
 
 
 
-=head2 getGoDesc
+=head2 get_go_description
 
-  $results = $obj->getGoDesc($goIDList)
+  $results = $obj->get_go_description($goIDList)
 
 =over 4
 
@@ -205,7 +205,7 @@ Extract GO term description for a given list of go-identifiers. This function ex
 
 =cut
 
-sub getGoDesc
+sub get_go_description
 {
     my($self, @args) = @_;
 
@@ -214,7 +214,7 @@ sub getGoDesc
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function getGoDesc (received $n, expecting 1)");
+							       "Invalid argument count for function get_go_description (received $n, expecting 1)");
     }
     {
 	my($goIDList) = @args;
@@ -222,38 +222,38 @@ sub getGoDesc
 	my @_bad_arguments;
         (ref($goIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"goIDList\" (value was \"$goIDList\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to getGoDesc:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_go_description:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'getGoDesc');
+								   method_name => 'get_go_description');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "Ontology.getGoDesc",
+	method => "Ontology.get_go_description",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'getGoDesc',
+					       method_name => 'get_go_description',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method getGoDesc",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_go_description",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'getGoDesc',
+					    method_name => 'get_go_description',
 				       );
     }
 }
 
 
 
-=head2 getGOEnrichment
+=head2 get_go_enrichment
 
-  $results = $obj->getGOEnrichment($sname, $geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($sname, $geneIDList, $domainList, $ecList, $type)
 
 =over 4
 
@@ -325,7 +325,7 @@ Note that the current released verion ignore test type and by default, it uses h
 
 =cut
 
-sub getGOEnrichment
+sub get_go_enrichment
 {
     my($self, @args) = @_;
 
@@ -334,7 +334,7 @@ sub getGOEnrichment
     if ((my $n = @args) != 5)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function getGOEnrichment (received $n, expecting 5)");
+							       "Invalid argument count for function get_go_enrichment (received $n, expecting 5)");
     }
     {
 	my($sname, $geneIDList, $domainList, $ecList, $type) = @args;
@@ -346,29 +346,29 @@ sub getGOEnrichment
         (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
         (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 5 \"type\" (value was \"$type\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to getGOEnrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'getGOEnrichment');
+								   method_name => 'get_go_enrichment');
 	}
     }
 
     my $result = $self->{client}->call($self->{url}, {
-	method => "Ontology.getGOEnrichment",
+	method => "Ontology.get_go_enrichment",
 	params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{code},
-					       method_name => 'getGOEnrichment',
+					       method_name => 'get_go_enrichment',
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method getGOEnrichment",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_go_enrichment",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'getGOEnrichment',
+					    method_name => 'get_go_enrichment',
 				       );
     }
 }
@@ -386,16 +386,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'getGOEnrichment',
+                method_name => 'get_go_enrichment',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method getGOEnrichment",
+            error => "Error invoking method get_go_enrichment",
             status_line => $self->{client}->status_line,
-            method_name => 'getGOEnrichment',
+            method_name => 'get_go_enrichment',
         );
     }
 }

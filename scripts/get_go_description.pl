@@ -5,11 +5,11 @@ use Getopt::Long;
 
 =head1 NAME
 
-getGoDesc - get GO id description
+get_go_description - get GO id description
 
 =head1 SYNOPSIS
 
-getGoDesc [--host=140.221.92.223:7062] < goIDs
+get_go_description [--host=140.221.92.223:7062] < goIDs
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ print version information
 
 =head1 SEE ALSO
 
-L<getGOIDList(1)>
+L<get_goidlist(1)>
 =cut
 
 use Bio::KBase::OntologyService::Client;
@@ -55,6 +55,11 @@ GetOptions("help"       => \$help,
 
 if($help)
 {
+    print <<MAN;
+    DESCRIPTION
+	Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (white space or comman separated) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
+    MAN
+
 	print "$usage\n";
 	print "\n";
 	print "General options\n";
@@ -70,7 +75,7 @@ if($help)
 	print "$0 --version\tprint out version information\n";
 	print "\n";
 	print "Report bugs to Shinjae Yoo at sjyoo\@bnl.gov\n";
-	exit(1);
+	exit(0);
 }
 
 if($version)
@@ -82,7 +87,7 @@ if($version)
 	print "There is NO WARRANTY, to the extent permitted by law.\n";
 	print "\n";
 	print "Written by Shinjae Yoo and Sunita Kumari\n";
-	exit(1);
+	exit(0);
 }
 
 die $usage unless @ARGV == 0;
@@ -92,7 +97,7 @@ my @input = <STDIN>;
 my $istr = join(" ", @input);
 $istr =~ s/[,|]/ /g;
 @input = split /\s+/, $istr;
-my $results = $oc->getGoDesc(\@input);
+my $results = $oc->get_go_description(\@input);
 
 foreach my $goID (keys %{$results}) {
   print "$goID\t${$results->{$goID}}[0]\t${$results->{$goID}}[1]\n";

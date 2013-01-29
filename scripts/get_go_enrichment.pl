@@ -6,11 +6,11 @@ use Getopt::Long;
 use DBI;
 =head1 NAME
 
-getGOEnrichment - find out enriched GO terms in a set of genes.
+get_go_enrichment - find out enriched GO terms in a set of genes.
 
 =head1 SYNOPSIS
 
-getGOEnrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
+get_go_enrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
 
 =head1 DESCRIPTION
 
@@ -46,10 +46,10 @@ print version information
 
 =head1 EXAMPLE
 
- echo AT1G71695.1 | getGOEnrichment --host=140.221.92.223:7062
- echo AT1G71695.1 | getGOEnrichment --evidence_code=[IEA,IEP]
- getGOEnrichment --help
- getGOEnrichment --version
+ echo AT1G71695.1 | get_go_enrichment --host=140.221.92.223:7062
+ echo AT1G71695.1 | get_go_enrichment --evidence_code=[IEA,IEP]
+ get_go_enrichment --help
+ get_go_enrichment --version
 
 =head1 VERSION
 
@@ -86,6 +86,10 @@ GetOptions("help"       => \$help,
 
 if($help)
 {
+    print <<MAN;
+    DESCRIPTION
+	For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular componenet"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test. Also, if input species is not provided then by default Arabidopsis thaliana is considered to the input species.
+     MAN
 	print "$usage\n";
 	print "\n";
 	print "General options\n";
@@ -100,7 +104,7 @@ if($help)
 	print "Examples: \n";
 	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
 	print "\n\n";
-	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'|perl scripts/getGOEnrichment.pl --host=localhost:7062";
+	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'| get_go_enrichment --host=localhost:7062";
 #	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | $0 --evidence_code=IEA --host=x.x.x.x:7062 --p_value=xxx \n";
 #	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOEnrichment.pl --p_value=0.05  --host=localhost:7062";
 	print "\n\n";
@@ -109,7 +113,7 @@ if($help)
 	print "$0 --version\tprint out version information\n";
 	print "\n";
 	print "Report bugs to Shinjae Yoo at sjyoo\@bnl.gov\n";
-	exit(1);
+	exit(0);
 }
 
 if($version)
@@ -121,7 +125,7 @@ if($version)
 	print "There is NO WARRANTY, to the extent permitted by law.\n";
 	print "\n";
 	print "Written by Shinjae Yoo and Sunita Kumari\n";
-	exit(1);
+	exit(0);
 }
 
 die $usage unless @ARGV == 0;
@@ -136,7 +140,7 @@ $istr =~ s/[,]/ /g;
 $sname="Athaliana" if $istr =~/g\.3899/;
 $sname="Ptrichocarpa" if $istr =~/g\.3907/;
 
-my $results = $oc->getGOEnrichment($sname, \@input, \@dl, \@el, $type);
+my $results = $oc->get_go_enrichment($sname, \@input, \@dl, \@el, $type);
 
 #print "@input\n===\n";
 
@@ -156,7 +160,7 @@ my $go_id=$hr->{"goID"};
 	foreach my $ggene(@input){
 	my @tem_gene_array;
 	$tem_gene_array[0]=$ggene;
-	my $my_goid_list=$oc->getGOIDList($sname,\@tem_gene_array,\@dl,\@el);
+	my $my_goid_list=$oc->get_goidlist($sname,\@tem_gene_array,\@dl,\@el);
 	my %my_hash=%$my_goid_list;
 	$tem_gene_hash{$ggene}=1 if grep /$go_id/, keys %{$my_hash{$ggene}};
 	}

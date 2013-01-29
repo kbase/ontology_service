@@ -43,9 +43,9 @@ sub new
 
 
 
-=head2 getGOIDList
+=head2 get_goidlist
 
-  $results = $obj->getGOIDList($sname, $geneIDList, $domainList, $ecList)
+  $results = $obj->get_goidlist($sname, $geneIDList, $domainList, $ecList)
 
 =over 4
 
@@ -117,7 +117,7 @@ For a given list of Features (aka Genes) from a particular genome (for example "
 
 =cut
 
-sub getGOIDList
+sub get_goidlist
 {
     my $self = shift;
     my($sname, $geneIDList, $domainList, $ecList) = @_;
@@ -128,14 +128,14 @@ sub getGOIDList
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to getGOIDList:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to get_goidlist:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGOIDList');
+							       method_name => 'get_goidlist');
     }
 
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
-    #BEGIN getGOIDList
+    #BEGIN get_goidlist
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
   
     if(defined $dbh->err && $dbh->err != 0) { # if there is any error
@@ -173,13 +173,13 @@ sub getGOIDList
       } # end of fetch and counting
     } # end of types
 
-    #END getGOIDList
+    #END get_goidlist
     my @_bad_returns;
     (ref($results) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to getGOIDList:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to get_goidlist:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGOIDList');
+							       method_name => 'get_goidlist');
     }
     return($results);
 }
@@ -187,9 +187,9 @@ sub getGOIDList
 
 
 
-=head2 getGoDesc
+=head2 get_go_description
 
-  $results = $obj->getGoDesc($goIDList)
+  $results = $obj->get_go_description($goIDList)
 
 =over 4
 
@@ -229,7 +229,7 @@ Extract GO term description for a given list of go-identifiers. This function ex
 
 =cut
 
-sub getGoDesc
+sub get_go_description
 {
     my $self = shift;
     my($goIDList) = @_;
@@ -237,14 +237,14 @@ sub getGoDesc
     my @_bad_arguments;
     (ref($goIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"goIDList\" (value was \"$goIDList\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to getGoDesc:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to get_go_description:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGoDesc');
+							       method_name => 'get_go_description');
     }
 
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
-    #BEGIN getGoDesc
+    #BEGIN get_go_description
     my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
   
     if(defined $dbh->err && $dbh->err != 0) { # if there is any error
@@ -264,13 +264,13 @@ my @tm_goID;
         $go2desc{$goID} = [$data[0],$data[1]];
       } # end of fetch and counting
     } # end of types
-    #END getGoDesc
+    #END get_go_description
     my @_bad_returns;
     (ref($results) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to getGoDesc:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to get_go_description:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGoDesc');
+							       method_name => 'get_go_description');
     }
     return($results);
 }
@@ -278,9 +278,9 @@ my @tm_goID;
 
 
 
-=head2 getGOEnrichment
+=head2 get_go_enrichment
 
-  $results = $obj->getGOEnrichment($sname, $geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($sname, $geneIDList, $domainList, $ecList, $type)
 
 =over 4
 
@@ -354,7 +354,7 @@ Note that the current released verion ignore test type and by default, it uses h
 
 =cut
 
-sub getGOEnrichment
+sub get_go_enrichment
 {
     my $self = shift;
     my($sname, $geneIDList, $domainList, $ecList, $type) = @_;
@@ -366,15 +366,15 @@ sub getGOEnrichment
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
     (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to getGOEnrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGOEnrichment');
+							       method_name => 'get_go_enrichment');
     }
 
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
-    #BEGIN getGOEnrichment
-    my $frst = getGOIDList($self,$sname, $geneIDList, $domainList, $ecList);
+    #BEGIN get_go_enrichment
+    my $frst = get_goidlist($self,$sname, $geneIDList, $domainList, $ecList);
     my %ukey = ();
    my @tem_goID=();
 	foreach my $geneID (keys %{$frst}) {
@@ -407,13 +407,13 @@ sub getGOEnrichment
       push @$results, \%rst;
     }
     
-    #END getGOEnrichment
+    #END get_go_enrichment
     my @_bad_returns;
     (ref($results) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to getGOEnrichment:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'getGOEnrichment');
+							       method_name => 'get_go_enrichment');
     }
     return($results);
 }

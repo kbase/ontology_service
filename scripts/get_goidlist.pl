@@ -7,11 +7,11 @@ use DBI;
 
 =head1 NAME
 
-getGOIDList - find out which GO terms are associated with a gene
+get_goidlist - find out which GO terms are associated with a gene
 
 =head1 SYNOPSIS
 
-getGOIDList [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA] < geneIDs
+get_goidlist [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA] < geneIDs
 
 =head1 DESCRIPTION
 
@@ -46,10 +46,10 @@ print version information
 
 =head1 EXAMPLE
 
- echo AT1G71695.1 | getGOIDList --host=140.221.92.223:7062
- echo AT1G71695.1 | getGOIDList --evidence_code=IEA
- getGOIDList --help
- getGOIDList --version
+ echo AT1G71695.1 | get_goidlist --host=140.221.92.223:7062
+ echo AT1G71695.1 | get_goidlist --evidence_code=IEA
+ get_goidlist --help
+ get_goidlist --version
 
 =head1 VERSION
 
@@ -82,6 +82,12 @@ GetOptions("help"       => \$help,
 
 if($help)
 {
+        print <<MAN;
+        DESCRIPTION
+	    This function call accepts four parameters: species name, a list of gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of gene-id to go-ids along with go-description, ontology domain, and evidence code; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, if no species is provided as input then by default, Arabidopsis thaliana is used as the input species.
+
+        MAN
+
 	print "$usage\n";
 	print "\n";
 	print "General options\n";
@@ -93,18 +99,18 @@ if($help)
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo 'kb|g.3899.locus.192,kb|g.3899.locus.2366' |perl scripts/getGOIDList.pl --host=localhost:7062 --evidence_code=IEA";
+	print "echo 'kb|g.3899.locus.192,kb|g.3899.locus.2366' |get_goidlist --host=localhost:7062 --evidence_code=IEA";
 #	print "echo AT1G71695.1 | $0 --host=x.x.x.x:7062 \n";
 	print "\n";
 #	print "echo AT1G71695.1 | $0 --evidence_code=IEA --host=localhost:7062 \n";
 	print "\n";
-#	print "echo AT1G03010.1,AT1G02830.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOIDList.pl  --host=localhost:7062\n";
+#	print "echo AT1G03010.1,AT1G02830.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | get_goidlist  --host=localhost:7062\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
 	print "$0 --version\tprint out version information\n";
 	print "\n";
 	print "Report bugs to Shinjae Yoo at sjyoo\@bnl.gov\n";
-	exit(1);
+	exit(0);
 }
 
 if($version)
@@ -116,7 +122,7 @@ if($version)
 	print "There is NO WARRANTY, to the extent permitted by law.\n";
 	print "\n";
 	print "Written by Shinjae Yoo and Sunita Kumari\n";
-	exit(1);
+	exit(0);
 }
 
 die $usage unless @ARGV == 0;
@@ -138,7 +144,7 @@ $sname="Ptrichocarpa" if $istr =~/g.\3907/;
 
 
 
-my $results = $oc->getGOIDList($sname, \@input, \@dl, \@el);
+my $results = $oc->get_goidlist($sname, \@input, \@dl, \@el);
 foreach my $geneID (keys %{$results}) {
   foreach my $goID (keys %{$results->{$geneID}}) {
     foreach my $mlh (@{$results->{$geneID}->{$goID}}) {

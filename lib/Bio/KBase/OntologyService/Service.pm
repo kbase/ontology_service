@@ -13,9 +13,9 @@ has 'valid_methods' => (is => 'ro', isa => 'HashRef', lazy => 1,
 our $CallContext;
 
 our %return_counts = (
-        'getGOIDList' => 1,
-        'getGoDesc' => 1,
-        'getGOEnrichment' => 1,
+        'get_goidlist' => 1,
+        'get_go_description' => 1,
+        'get_go_enrichment' => 1,
         'version' => 1,
 );
 
@@ -25,9 +25,9 @@ sub _build_valid_methods
 {
     my($self) = @_;
     my $methods = {
-        'getGOIDList' => 1,
-        'getGoDesc' => 1,
-        'getGOEnrichment' => 1,
+        'get_goidlist' => 1,
+        'get_go_description' => 1,
+        'get_go_enrichment' => 1,
         'version' => 1,
     };
     return $methods;
