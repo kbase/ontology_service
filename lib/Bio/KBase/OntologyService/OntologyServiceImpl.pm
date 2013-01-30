@@ -391,7 +391,7 @@ sub get_go_enrichment
 
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
-    my $rh_goDescList = getGoDesc($self, \@goIDList);
+    my $rh_goDescList = get_go_description($self, \@goIDList);
     my $rh_goID2Count = getGoSize($sname, \@goIDList, $domainList, $ecList);
     my $wholeGeneSize = 10000;
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
