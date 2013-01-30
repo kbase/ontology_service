@@ -58,7 +58,7 @@ if($help)
     print <<MAN;
     DESCRIPTION
 	Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (white space or comman separated) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
-    MAN
+MAN
 
 	print "$usage\n";
 	print "\n";
