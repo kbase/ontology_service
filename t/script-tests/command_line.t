@@ -24,14 +24,14 @@ my $gene_list='kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb
 
 note("Create Test::Cmd objects for all of the scripts");
 
-my $getgodes = Test::Cmd->new(prog => "$bin/getGoDesc.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
-ok($getgodes, "creating Test::Cmd object for getGoDesc.p");
+my $getgodes = Test::Cmd->new(prog => "$bin/get_go_description.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
+ok($getgodes, "creating Test::Cmd object for get_go_description.p");
 
-my $getgoenrich = Test::Cmd->new(prog => "$bin/getGOEnrichment.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
-ok($getgoenrich, "creating Test::Cmd object for getGOEnrichment.pl ");
+my $getgoenrich = Test::Cmd->new(prog => "$bin/get_go_enrichment.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
+ok($getgoenrich, "creating Test::Cmd object for get_go_enrichment.pl ");
 
-my $getgoid = Test::Cmd->new(prog => "$bin/getGOIDList.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
-ok($getgoid, "creating Test::Cmd object for getGOIDList.pl");
+my $getgoid = Test::Cmd->new(prog => "$bin/get_goidlist.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
+ok($getgoid, "creating Test::Cmd object for get_goidlist.pl");
 
 
 
@@ -55,14 +55,14 @@ $line=join"\t",@tem;
 ok($line!~/GO:0009535/, "Evidence code appplied");
 
 $getgoenrich->run(args => "--host=$host", stdin => "$gene_list");
-ok($? ==0,"Running getGOEnrichment");
+ok($? ==0,"Running get_go_enrichment");
 @tem=$getgoenrich->stdout;
 $line=join"\t",@tem;
 ok($line=~/mitochondrial electron transport/, "Successfully got the GO enrichment");
 
 
 $getgoenrich->run(args => "--host=$host --p_value=0.001", stdin => "$gene_list");
-ok($? ==0,"Running getGOEnrichment");
+ok($? ==0,"Running get_go_enrichment");
 @tem=$getgoenrich->stdout;
 $line=join"\t",@tem;
 ok($line!~/mitochondrial electron transport/ , "P-value applied");
