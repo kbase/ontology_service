@@ -61,11 +61,11 @@ $line=join"\t",@tem;
 ok($line=~/mitochondrial electron transport/, "Successfully got the GO enrichment");
 
 
-$getgoenrich->run(args => "--host=$host --p_value=0.001", stdin => "$gene_list");
+$getgoenrich->run(args => "--host=$host --p_value=0.005", stdin => "$gene_list");
 ok($? ==0,"Running get_go_enrichment");
 @tem=$getgoenrich->stdout;
 $line=join"\t",@tem;
-ok($line!~/mitochondrial electron transport/ , "P-value applied");
+ok($line=~/mitochondrial electron transport/ && $line !~/electron transport chain/ , "P-value applied");
 
  
 
