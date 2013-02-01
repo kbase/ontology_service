@@ -45,7 +45,7 @@ sub new
 
 =head2 get_goidlist
 
-  $results = $obj->get_goidlist($sname, $geneIDList, $domainList, $ecList)
+  $results = $obj->get_goidlist($geneIDList, $domainList, $ecList)
 
 =over 4
 
@@ -54,12 +54,10 @@ sub new
 =begin html
 
 <pre>
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoInfo
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -82,12 +80,10 @@ GoDesc is a string
 
 =begin text
 
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoInfo
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -120,10 +116,9 @@ For a given list of Features (aka Genes) from a particular genome (for example "
 sub get_goidlist
 {
     my $self = shift;
-    my($sname, $geneIDList, $domainList, $ecList) = @_;
+    my($geneIDList, $domainList, $ecList) = @_;
 
     my @_bad_arguments;
-    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -280,7 +275,7 @@ my @tm_goID;
 
 =head2 get_go_enrichment
 
-  $results = $obj->get_go_enrichment($sname, $geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type)
 
 =over 4
 
@@ -289,13 +284,11 @@ my @tm_goID;
 =begin html
 
 <pre>
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -317,13 +310,11 @@ GoDesc is a string
 
 =begin text
 
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -357,10 +348,9 @@ Note that the current released verion ignore test type and by default, it uses h
 sub get_go_enrichment
 {
     my $self = shift;
-    my($sname, $geneIDList, $domainList, $ecList, $type) = @_;
+    my($geneIDList, $domainList, $ecList, $type) = @_;
 
     my @_bad_arguments;
-    (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument \"sname\" (value was \"$sname\")");
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
@@ -374,7 +364,7 @@ sub get_go_enrichment
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN get_go_enrichment
-    my $frst = get_goidlist($self,$sname, $geneIDList, $domainList, $ecList);
+    my $frst = get_goidlist($self, $geneIDList, $domainList, $ecList);
     my %ukey = ();
    my @tem_goID=();
 	foreach my $geneID (keys %{$frst}) {
@@ -391,8 +381,12 @@ sub get_go_enrichment
 
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
+	my $sname;
+$sname="Athaliana" if $geneIDList =~/g\.3899/;
+$sname="Ptrichocarpa" if $geneIDList =~/g\.3907/;
+
     my $rh_goDescList = get_go_description($self, \@goIDList);
-    my $rh_goID2Count = getGoSize($sname, \@goIDList, $domainList, $ecList);
+    my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList);
     my $wholeGeneSize = 10000;
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};

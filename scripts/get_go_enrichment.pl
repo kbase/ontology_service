@@ -138,10 +138,10 @@ my @input = <STDIN>;
 my $istr = join(" ", @input);
 $istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
-$sname="Athaliana" if $istr =~/g\.3899/;
-$sname="Ptrichocarpa" if $istr =~/g\.3907/;
+#$sname="Athaliana" if $istr =~/g\.3899/;
+#$sname="Ptrichocarpa" if $istr =~/g\.3907/;
 
-my $results = $oc->get_go_enrichment($sname, \@input, \@dl, \@el, $type);
+my $results = $oc->get_go_enrichment( \@input, \@dl, \@el, $type);
 
 #print "@input\n===\n";
 
@@ -161,7 +161,7 @@ my $go_id=$hr->{"goID"};
 	foreach my $ggene(@input){
 	my @tem_gene_array;
 	$tem_gene_array[0]=$ggene;
-	my $my_goid_list=$oc->get_goidlist($sname,\@tem_gene_array,\@dl,\@el);
+	my $my_goid_list=$oc->get_goidlist(\@tem_gene_array,\@dl,\@el);
 	my %my_hash=%$my_goid_list;
 	$tem_gene_hash{$ggene}=1 if grep /$go_id/, keys %{$my_hash{$ggene}};
 	}

@@ -54,12 +54,12 @@ note("Test   getGOIDlist");
 
 #  Test - Use valid data. Expect hash with data to be returned
 
-my $species = "Athaliana";
+#my $species = "Athaliana";
 my @genes   = qw(kb|g.3899.locus.192 kb|g.3899.locus.164);
 my @domains = qw(biological_process molecular_function cellular_component);
 my @ecs     = qw(IEA TAS NAS EXP IDA IPI ISS);
 
-$ret = $client->get_goidlist($species, \@genes, \@domains, \@ecs);
+$ret = $client->get_goidlist( \@genes, \@domains, \@ecs);
 is(ref($ret), 'HASH', "use valid data: get_goidlist returns a hash");
 
 my @ret_keys = keys %$ret;
@@ -77,15 +77,15 @@ my @empty;
 my @bogus1 = qw(BOGUS bogus);
 my @bogus2 = qw(bogus);
 
-$ret = $client->get_goidlist($species, \@bogus1, \@bogus2, \@bogus2);
+$ret = $client->get_goidlist( \@bogus1, \@bogus2, \@bogus2);
 is(ref($ret), 'HASH', "use invalid data: get_goidlist returns a hash");
 
 #  Test - Too many or too few parameters
 
-eval { $ret = $client->get_goidlist($species, \@genes, \@domains, \@ecs, \@bogus1); };
+eval { $ret = $client->get_goidlist( \@genes, \@domains, \@ecs, \@bogus1); };
 isnt($@, undef, 'call with too many parameters failed properly');
 
-eval { $ret = $client->get_goidlist($species); };
+eval { $ret = $client->get_goidlist(\@domains); };
 isnt($@, undef, 'call with too few parameters failed properly');
 
 
@@ -138,21 +138,21 @@ my $type1    = 'hypergeometric';
 my $type2    = 'chisq';
 my $bad_type = 'bad_type_string';
 
-$ret = $client->get_go_enrichment($species, \@genes, \@domains, \@ecs, $type1);
+$ret = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $type1);
 isnt($ret->[0]->{pvalue}, undef, 'call with valid data returns pvalue');
 
 SKIP: {
   skip( 'not supported in this version', 3 );
-  $ret = $client->get_go_enrichment($species, \@genes, \@domains, \@ecs, $type2);
+  $ret = $client->get_go_enrichment( \@genes, \@domains, \@ecs, $type2);
   isnt($ret->[1]->{goDesc}, undef, 'call with valid data returns goDesc');
 
-  my $ret2 = $client->get_go_enrichment($species, \@genes, [], [], $type2);
+  my $ret2 = $client->get_go_enrichment( \@genes, [], [], $type2);
   #is(@$ret2 >= @$ret, 1, 'call with valid data and no filter returns at least as much data');
   cmp_ok(scalar @$ret2, '<=', scalar @$ret, 'call with valid data and no filter returns at least as much data');
 
   # Not sure what the correct behavior should be when a bad type is supplied
   $ret2 = undef;
-  $ret2 = $client->get_go_enrichment($species, \@genes, \@domains, \@ecs, $bad_type);
+  $ret2 = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $bad_type);
   isnt(Dumper($ret2), Dumper($ret), 'call with bad type returns different results');
 }
 

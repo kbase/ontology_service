@@ -62,7 +62,7 @@ use Bio::KBase::OntologyService::Client;
 my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA] < geneIDs\n";
 
 my $host       = "140.221.92.223:7062";
-my $sname      = "Athaliana";
+#my $sname      = "Athaliana";
 #my $domainList = ("biological_process","molecular_function","cellular_component");
 #my $ecList     = ("IEA","IDA","IPI","IMP","IGI","IEP","ISS","ISS","ISO","ISA","ISM","IGC","IBA","IBD","IKR","IRD","RCA","TAS","NAS","IC","ND","NR");
 my $domainList="biological_process,molecular_function,cellular_component";
@@ -76,7 +76,7 @@ my $version    = 0;
 GetOptions("help"       => \$help,
            "version"    => \$version,
            "host=s"     => \$host, 
-           "species_name=s"    => \$sname, 
+        #   "species_name=s"    => \$sname, 
            "domain_list=s" => \$domainList, 
            "evidence_code_list=s" => \$ecList) or die $usage;
 
@@ -138,12 +138,12 @@ my @input = <STDIN>;
 my $istr = join(" ", @input);
 $istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
-$sname="Athaliana" if $istr =~/g\.3899/;
-$sname="Ptrichocarpa" if $istr =~/g.\3907/;
+#$sname="Athaliana" if $istr =~/g\.3899/;
+#$sname="Ptrichocarpa" if $istr =~/g.\3907/;
 
 
 
-my $results = $oc->get_goidlist($sname, \@input, \@dl, \@el);
+my $results = $oc->get_goidlist(\@input, \@dl, \@el);
 foreach my $geneID (keys %{$results}) {
   foreach my $goID (keys %{$results->{$geneID}}) {
     foreach my $mlh (@{$results->{$geneID}->{$goID}}) {

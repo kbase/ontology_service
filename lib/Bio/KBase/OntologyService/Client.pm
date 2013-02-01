@@ -46,7 +46,7 @@ sub new
 
 =head2 get_goidlist
 
-  $results = $obj->get_goidlist($sname, $geneIDList, $domainList, $ecList)
+  $results = $obj->get_goidlist($geneIDList, $domainList, $ecList)
 
 =over 4
 
@@ -55,12 +55,10 @@ sub new
 =begin html
 
 <pre>
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoInfo
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -83,12 +81,10 @@ GoDesc is a string
 
 =begin text
 
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $results is a GeneIDMap2GoInfo
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -122,19 +118,18 @@ sub get_goidlist
 
 # Authentication: none
 
-    if ((my $n = @args) != 4)
+    if ((my $n = @args) != 3)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_goidlist (received $n, expecting 4)");
+							       "Invalid argument count for function get_goidlist (received $n, expecting 3)");
     }
     {
-	my($sname, $geneIDList, $domainList, $ecList) = @args;
+	my($geneIDList, $domainList, $ecList) = @args;
 
 	my @_bad_arguments;
-        (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument 1 \"sname\" (value was \"$sname\")");
-        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"geneIDList\" (value was \"$geneIDList\")");
-        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"domainList\" (value was \"$domainList\")");
-        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
+        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"geneIDList\" (value was \"$geneIDList\")");
+        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"domainList\" (value was \"$domainList\")");
+        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"ecList\" (value was \"$ecList\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_goidlist:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -253,7 +248,7 @@ sub get_go_description
 
 =head2 get_go_enrichment
 
-  $results = $obj->get_go_enrichment($sname, $geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type)
 
 =over 4
 
@@ -262,13 +257,11 @@ sub get_go_description
 =begin html
 
 <pre>
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -290,13 +283,11 @@ GoDesc is a string
 
 =begin text
 
-$sname is a Species
 $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
 $results is an EnrichmentList
-Species is a string
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
 DomainList is a reference to a list where each element is a Domain
@@ -331,20 +322,19 @@ sub get_go_enrichment
 
 # Authentication: none
 
-    if ((my $n = @args) != 5)
+    if ((my $n = @args) != 4)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_go_enrichment (received $n, expecting 5)");
+							       "Invalid argument count for function get_go_enrichment (received $n, expecting 4)");
     }
     {
-	my($sname, $geneIDList, $domainList, $ecList, $type) = @args;
+	my($geneIDList, $domainList, $ecList, $type) = @args;
 
 	my @_bad_arguments;
-        (!ref($sname)) or push(@_bad_arguments, "Invalid type for argument 1 \"sname\" (value was \"$sname\")");
-        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"geneIDList\" (value was \"$geneIDList\")");
-        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"domainList\" (value was \"$domainList\")");
-        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 4 \"ecList\" (value was \"$ecList\")");
-        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 5 \"type\" (value was \"$type\")");
+        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"geneIDList\" (value was \"$geneIDList\")");
+        (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"domainList\" (value was \"$domainList\")");
+        (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"ecList\" (value was \"$ecList\")");
+        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 4 \"type\" (value was \"$type\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,

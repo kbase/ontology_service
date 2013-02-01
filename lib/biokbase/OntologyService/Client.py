@@ -47,10 +47,10 @@ class Ontology:
         if self.timeout < 1:
             raise ValueError('Timeout value must be at least 1 second')
 
-    def get_goidlist(self, sname, geneIDList, domainList, ecList):
+    def get_goidlist(self, geneIDList, domainList, ecList):
 
         arg_hash = { 'method': 'Ontology.get_goidlist',
-                     'params': [sname, geneIDList, domainList, ecList],
+                     'params': [geneIDList, domainList, ecList],
                      'version': '1.1'
                      }
 
@@ -103,10 +103,10 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def get_go_enrichment(self, sname, geneIDList, domainList, ecList, type):
+    def get_go_enrichment(self, geneIDList, domainList, ecList, type):
 
         arg_hash = { 'method': 'Ontology.get_go_enrichment',
-                     'params': [sname, geneIDList, domainList, ecList, type],
+                     'params': [geneIDList, domainList, ecList, type],
                      'version': '1.1'
                      }
 
