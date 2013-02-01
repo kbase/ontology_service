@@ -103,10 +103,10 @@ class Ontology:
         else:
             raise ServerError('Unknown', 0, 'An unknown server error occurred')
 
-    def get_go_enrichment(self, geneIDList, domainList, ecList, type):
+    def get_go_enrichment(self, geneIDList, domainList, ecList, type, ontologytype):
 
         arg_hash = { 'method': 'Ontology.get_go_enrichment',
-                     'params': [geneIDList, domainList, ecList, type],
+                     'params': [geneIDList, domainList, ecList, type, ontologytype],
                      'version': '1.1'
                      }
 

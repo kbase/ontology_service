@@ -132,22 +132,24 @@ note("Test   get_go_enrichment");
 my $type1    = 'hypergeometric';
 my $type2    = 'chisq';
 my $bad_type = 'bad_type_string';
+my $ontologytype= 'GO';
 
-$ret = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $type1);
+
+$ret = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $type1, $ontologytype);
 isnt($ret->[0]->{pvalue}, undef, 'call with valid data returns pvalue');
 
 SKIP: {
   skip( 'not supported in this version', 3 );
-  $ret = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $type2);
+  $ret = $client->get_go_enrichment(\@genes, \@domains, \@ecs, $type2,$ontologytype);
   isnt($ret->[1]->{goDesc}, undef, 'call with valid data returns goDesc');
 
-  my $ret2 = $client->get_go_enrichment( \@genes, [], [], $type2);
+  my $ret2 = $client->get_go_enrichment( \@genes, [], [], $type2,$ontologytype);
   #is(@$ret2 >= @$ret, 1, 'call with valid data and no filter returns at least as much data');
   cmp_ok(scalar @$ret2, '<=', scalar @$ret, 'call with valid data and no filter returns at least as much data');
 
   # Not sure what the correct behavior should be when a bad type is supplied
   $ret2 = undef;
-  $ret2 = $client->get_go_enrichment( \@genes, \@domains, \@ecs, $bad_type);
+  $ret2 = $client->get_go_enrichment( \@genes, \@domains, \@ecs, $bad_type,$ontologytype);
   isnt(Dumper($ret2), Dumper($ret), 'call with bad type returns different results');
 }
 

@@ -275,7 +275,7 @@ my @tm_goID;
 
 =head2 get_go_enrichment
 
-  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type, $ontologytype)
 
 =over 4
 
@@ -288,6 +288,7 @@ $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
+$ontologytype is an ontology_type
 $results is an EnrichmentList
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -296,6 +297,7 @@ Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
 TestType is a string
+ontology_type is a string
 EnrichmentList is a reference to a list where each element is an Enrichment
 Enrichment is a reference to a hash where the following keys are defined:
 	goID has a value which is a GoID
@@ -314,6 +316,7 @@ $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
+$ontologytype is an ontology_type
 $results is an EnrichmentList
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -322,6 +325,7 @@ Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
 TestType is a string
+ontology_type is a string
 EnrichmentList is a reference to a list where each element is an Enrichment
 Enrichment is a reference to a hash where the following keys are defined:
 	goID has a value which is a GoID
@@ -348,13 +352,14 @@ Note that the current released verion ignore test type and by default, it uses h
 sub get_go_enrichment
 {
     my $self = shift;
-    my($geneIDList, $domainList, $ecList, $type) = @_;
+    my($geneIDList, $domainList, $ecList, $type, $ontologytype) = @_;
 
     my @_bad_arguments;
     (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"geneIDList\" (value was \"$geneIDList\")");
     (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"domainList\" (value was \"$domainList\")");
     (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"ecList\" (value was \"$ecList\")");
     (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
+    (!ref($ontologytype)) or push(@_bad_arguments, "Invalid type for argument \"ontologytype\" (value was \"$ontologytype\")");
     if (@_bad_arguments) {
 	my $msg = "Invalid arguments passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -389,14 +394,21 @@ sub get_go_enrichment
     #$sname="Ptrichocarpa" if $geneIDList =~/g\.3907/;
 
     my $rh_goDescList = get_go_description($self, \@goIDList);
-    my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList);
+    my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList, $ontologytype);
     my $wholeGeneSize = 10000;
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
-         $wholeGeneSize = 22000 if $geneIDList=~/g\.3899/; # temporary... based on gene ID <-- need to be changed...
-         $wholeGeneSize = 45000 if $geneIDList=~/g\.3907/;
+       #  $wholeGeneSize = 22000 if $geneIDList=~/g\.3899/; # temporary... based on gene ID <-- need to be changed...
+       #  $wholeGeneSize = 45000 if $geneIDList=~/g\.3907/;
 
+my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+my  $pstmt = $dbh->prepare(" select count( distinct TranscriptID) from ontologies where SName = 'Athaliana'");
+$pstmt->execute();
+my $res=$pstmt->fetchrow_hashref();
+foreach (keys %$res){
+$wholeGeneSize=$res->{$_};
+}
 
 
 	 # calc p-value using any h.g. test
@@ -900,6 +912,32 @@ a reference to a list where each element is an EvidenceCode
 =begin text
 
 a reference to a list where each element is an EvidenceCode
+
+=end text
+
+=back
+
+
+
+=head2 ontology_type
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
 
 =end text
 

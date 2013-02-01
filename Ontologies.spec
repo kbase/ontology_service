@@ -97,6 +97,9 @@ module Ontology : Ontology
   /* A list of ontology term evidence codes. One ontology term can have one or more evidence codes. */
   typedef list<EvidenceCode> EvidenceCodeList;
 
+  typedef string ontology_type;
+
+
   typedef structure {
     Domain domain;
     EvidenceCode ec;
@@ -130,5 +133,5 @@ module Ontology : Ontology
 
 Note that the current released verion ignore test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. Also, if no species name is provided then Athaliana is used as the default species.
 */
-  funcdef get_go_enrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type) returns (EnrichmentList results);  
+  funcdef get_go_enrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type,ontology_type ontologytype) returns (EnrichmentList results);  
 };

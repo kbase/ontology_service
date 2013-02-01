@@ -248,7 +248,7 @@ sub get_go_description
 
 =head2 get_go_enrichment
 
-  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type)
+  $results = $obj->get_go_enrichment($geneIDList, $domainList, $ecList, $type, $ontologytype)
 
 =over 4
 
@@ -261,6 +261,7 @@ $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
+$ontologytype is an ontology_type
 $results is an EnrichmentList
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -269,6 +270,7 @@ Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
 TestType is a string
+ontology_type is a string
 EnrichmentList is a reference to a list where each element is an Enrichment
 Enrichment is a reference to a hash where the following keys are defined:
 	goID has a value which is a GoID
@@ -287,6 +289,7 @@ $geneIDList is a GeneIDList
 $domainList is a DomainList
 $ecList is an EvidenceCodeList
 $type is a TestType
+$ontologytype is an ontology_type
 $results is an EnrichmentList
 GeneIDList is a reference to a list where each element is a GeneID
 GeneID is a string
@@ -295,6 +298,7 @@ Domain is a string
 EvidenceCodeList is a reference to a list where each element is an EvidenceCode
 EvidenceCode is a string
 TestType is a string
+ontology_type is a string
 EnrichmentList is a reference to a list where each element is an Enrichment
 Enrichment is a reference to a hash where the following keys are defined:
 	goID has a value which is a GoID
@@ -322,19 +326,20 @@ sub get_go_enrichment
 
 # Authentication: none
 
-    if ((my $n = @args) != 4)
+    if ((my $n = @args) != 5)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_go_enrichment (received $n, expecting 4)");
+							       "Invalid argument count for function get_go_enrichment (received $n, expecting 5)");
     }
     {
-	my($geneIDList, $domainList, $ecList, $type) = @args;
+	my($geneIDList, $domainList, $ecList, $type, $ontologytype) = @args;
 
 	my @_bad_arguments;
         (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"geneIDList\" (value was \"$geneIDList\")");
         (ref($domainList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 2 \"domainList\" (value was \"$domainList\")");
         (ref($ecList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 3 \"ecList\" (value was \"$ecList\")");
         (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 4 \"type\" (value was \"$type\")");
+        (!ref($ontologytype)) or push(@_bad_arguments, "Invalid type for argument 5 \"ontologytype\" (value was \"$ontologytype\")");
         if (@_bad_arguments) {
 	    my $msg = "Invalid arguments passed to get_go_enrichment:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
@@ -863,6 +868,32 @@ a reference to a list where each element is an EvidenceCode
 =begin text
 
 a reference to a list where each element is an EvidenceCode
+
+=end text
+
+=back
+
+
+
+=head2 ontology_type
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
 
 =end text
 

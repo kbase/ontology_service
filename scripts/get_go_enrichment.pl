@@ -72,7 +72,7 @@ my $version    = 0;
 my $domainList="biological_process,molecular_function,cellular_component";
 my $ecList     = "IEA,IDA,IPI,IMP,IGI,IEP,ISS,ISS,ISO,ISA,ISM,IGC,IBA,IBD,IKR,IRD,RCA,TAS,NAS,IC,ND,NR";
 my $pvalue_cutoff="0.05";
-
+my $ontologytype="GO";
 
 GetOptions("help"       => \$help,
            "version"    => \$version,
@@ -81,7 +81,8 @@ GetOptions("help"       => \$help,
            "domain_list=s" => \$domainList, 
            "evidence_code_list=s" => \$ecList,
            "test_type=s" => \$type,
-	"p_value=s"=>\$pvalue_cutoff
+	"p_value=s"=>\$pvalue_cutoff,
+"ontology_type=s"=>\$ontologytype
 ) or die $usage;
 
 if($help)
@@ -141,13 +142,13 @@ $istr =~ s/[,]/ /g;
 #$sname="Athaliana" if $istr =~/g\.3899/;
 #$sname="Ptrichocarpa" if $istr =~/g\.3907/;
 
-my $results = $oc->get_go_enrichment( \@input, \@dl, \@el, $type);
+my $results = $oc->get_go_enrichment( \@input, \@dl, \@el, $type, $ontologytype);
 
 #print "@input\n===\n";
 
 foreach my $hr (@$results) {
 
-	next if $hr->{"goID"} !~/GO/;
+	next if $hr->{"goID"} !~/$ontologytype/;
 	
 	next if  $hr->{"pvalue"} >=  $pvalue_cutoff;
 	print $hr->{"goID"}."\t".$hr->{"pvalue"}."\t".${$hr->{"goDesc"}}[0]."\t".${$hr->{"goDesc"}}[1]."\t";
