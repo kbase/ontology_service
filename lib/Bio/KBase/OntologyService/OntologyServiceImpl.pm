@@ -382,8 +382,11 @@ sub get_go_enrichment
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
 	my $sname;
-$sname="Athaliana" if $geneIDList =~/g\.3899/;
-$sname="Ptrichocarpa" if $geneIDList =~/g\.3907/;
+    $$geneIDList[0] =~ m/^(kb\|g\.\d+\.)/;
+    $sname = $1;
+    # TODO: throw exception if there is no match
+    #$sname="Athaliana" if $geneIDList =~/g\.3899/;
+    #$sname="Ptrichocarpa" if $geneIDList =~/g\.3907/;
 
     my $rh_goDescList = get_go_description($self, \@goIDList);
     my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList);
