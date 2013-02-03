@@ -389,22 +389,19 @@ sub get_go_enrichment
     my $rh_goDescList = get_go_description($self, \@goIDList);
     my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList, $ontologytype);
     my $wholeGeneSize = 10000;
+    #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    my  $pstmt = $dbh->prepare("select count( distinct kblocusid) from ontologies_int where kblocusid like '$sname%'");
+    $pstmt->execute();
+    my $res=$pstmt->fetchrow_hashref();
+    foreach (keys %$res){
+      $wholeGeneSize=$res->{$_};
+      last;
+    }
+          
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
-      #  $wholeGeneSize = 22000 if $geneIDList=~/g\.3899/; # temporary... based on gene ID <-- need to be changed...
-      #  $wholeGeneSize = 45000 if $geneIDList=~/g\.3907/;
-
-      #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
-      my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
-          
-      my  $pstmt = $dbh->prepare(" select count( distinct TranscriptID) from ontologies where SName = 'Athaliana'");
-      $pstmt->execute();
-my $res=$pstmt->fetchrow_hashref();
-foreach (keys %$res){
-$wholeGeneSize=$res->{$_};
-}
-
 
 	 # calc p-value using any h.g. test
       my %rst = ();
