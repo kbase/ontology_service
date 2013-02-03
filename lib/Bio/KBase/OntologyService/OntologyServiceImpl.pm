@@ -131,7 +131,8 @@ sub get_goidlist
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN get_goidlist
-    my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
   
     if(defined $dbh->err && $dbh->err != 0) { # if there is any error
       return []; # return empty list
@@ -142,23 +143,13 @@ sub get_goidlist
 
     my %g2idlist = (); # gene to id list
     $results = \%g2idlist;
-    my $pstmt_apr = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies_int where kblocusid like ? and OntologyType = 'GO'");
     my $pstmt_exc = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies_int where kblocusid = ? and OntologyType = 'GO'");
     my $pstmt;
     foreach my $geneID (@{$geneIDList}) {
 
-      if($geneID =~ m/^A[tT]\d[gG]\d{5}$/ || $geneID =~ m/^POPTR_\d{4}[sS]\d{5}$/) {
-        $pstmt_apr->bind_param(1, uc($geneID).".%");
-        $pstmt_apr->execute();
-        $pstmt = $pstmt_apr;
-      } else {
-        $pstmt_exc->bind_param(1, $geneID);
-        $pstmt_exc->execute();
-        $pstmt = $pstmt_exc;
-      }
-
-      $pstmt->bind_param(1, $geneID);
-      $pstmt->execute();
+      $pstmt_exc->bind_param(1, $geneID);
+      $pstmt_exc->execute();
+      $pstmt = $pstmt_exc;
       while( my @data = $pstmt->fetchrow_array()) {
         next if (! defined $domainMap{$data[2]}) && ($#$domainList > -1);
         next if (! defined $ecMap{$data[3]}) && ($#$ecList > -1);
@@ -240,7 +231,9 @@ sub get_go_description
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN get_go_description
-    my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+        
   
     if(defined $dbh->err && $dbh->err != 0) { # if there is any error
       return []; # return empty list
@@ -399,12 +392,14 @@ sub get_go_enrichment
     for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
       my $goDesc = $rh_goDescList->{$goIDList[$i]};
       my $goSize = $rh_goID2Count->{$goIDList[$i]};
-       #  $wholeGeneSize = 22000 if $geneIDList=~/g\.3899/; # temporary... based on gene ID <-- need to be changed...
-       #  $wholeGeneSize = 45000 if $geneIDList=~/g\.3907/;
+      #  $wholeGeneSize = 22000 if $geneIDList=~/g\.3899/; # temporary... based on gene ID <-- need to be changed...
+      #  $wholeGeneSize = 45000 if $geneIDList=~/g\.3907/;
 
-my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
-my  $pstmt = $dbh->prepare(" select count( distinct TranscriptID) from ontologies where SName = 'Athaliana'");
-$pstmt->execute();
+      #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+      my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+          
+      my  $pstmt = $dbh->prepare(" select count( distinct TranscriptID) from ontologies where SName = 'Athaliana'");
+      $pstmt->execute();
 my $res=$pstmt->fetchrow_hashref();
 foreach (keys %$res){
 $wholeGeneSize=$res->{$_};

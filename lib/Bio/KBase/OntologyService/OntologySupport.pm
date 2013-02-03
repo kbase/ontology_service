@@ -12,7 +12,9 @@ $VERSION     = 1.00;
 sub getGoSize { 
     (my $sname, my $goIDList, my $domainList, my $ecList, my $type) = @_;
 
-    my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    #my $dbh = DBI->connect("DBI:mysql:networks_pdev;host=db1.chicago.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+    my $dbh = DBI->connect("DBI:mysql:kbase_plant;host=devdb1.newyork.kbase.us",'networks_pdev', '',  { RaiseError => 1 } );
+          
   
     if(defined $dbh->err && $dbh->err != 0) { # if there is any error
       return []; # return empty list
