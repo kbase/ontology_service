@@ -10,7 +10,7 @@ get_go_enrichment - find out enriched GO terms in a set of genes.
 
 =head1 SYNOPSIS
 
-get_go_enrichment [--host=140.221.92.223:7072] [--species_name=Athaliana] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
+get_go_enrichment [--url=http://kbase.us/services/ontology_service] [--domain_list=biological_process,molecular_function,cellular_component] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDsList
 
 =head1 DESCRIPTION
 
@@ -18,23 +18,21 @@ Use this function to perform GO enrichment analysis on a set of genes.
 
 =head2 Documentation for underlying call
 
-For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular componenet"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test. Also, if input species is not provided then by default Arabidopsis thaliana is considered to the input species.
+For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts four parameters: A list of gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular componenet"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test. 
 
 
 =head1 OPTIONS
 
 =over 6
 
-=item B<-h> I<[140.221.92.223:7062]> B<--host>=I<[140.221.92.223:7062]>
-hostname of the server
+=item B<--url> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
+url of the server
 
 =item B<--help>
 prints help information
 
 =item B<--version>
 print version information
-
-=item B<--species_name> comma separated list of species name e.g. [Athaliana,Zmays]
 
 =item B<--domain_list> comman separated list of ontology domains e.g. [biological_process,molecular_function,cellular_component]
 
@@ -46,8 +44,8 @@ print version information
 
 =head1 EXAMPLE
 
- echo AT1G71695.1 | get_go_enrichment --host=140.221.92.223:7062
- echo AT1G71695.1 | get_go_enrichment --evidence_code=[IEA,IEP]
+ echo "kb|g.3899.locus.2366" | get_go_enrichment
+ echo "kb|g.3899.locus.2366" | get_go_enrichment --evidence_code=[IEA,IEP]
  get_go_enrichment --help
  get_go_enrichment --version
 
@@ -59,16 +57,12 @@ print version information
 
 use Bio::KBase::OntologyService::Client;
 
-my $usage = "Usage: $0 [--host=140.221.92.223:7062] [--species_name=Athaliana] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] < geneIDs  [--p_value=XXX]\n";
+my $usage = "Usage: $0 [--url=http://kbase.us/services/ontology_service] [--domain_list=biological_process] [--evidence_code_list=IEA]  [--test_type=hypergeometric] [--p_value=XXX]< geneIDs  \n";
 
-my $host       = "140.221.92.223:7062";
-my $sname      = "Athaliana" ;
-#my $domainList = "biological_process";
-#my $ecList     = "IEA";
+my $url        = "http://kbase.us/services/ontology_service";
 my $type       = "hypergeometric";
 my $help       = 0;
 my $version    = 0;
-
 my $domainList="biological_process,molecular_function,cellular_component";
 my $ecList     = "IEA,IDA,IPI,IMP,IGI,IEP,ISS,ISS,ISO,ISA,ISM,IGC,IBA,IBD,IKR,IRD,RCA,TAS,NAS,IC,ND,NR";
 my $pvalue_cutoff="0.05";
@@ -76,8 +70,7 @@ my $ontologytype="GO";
 
 GetOptions("help"       => \$help,
            "version"    => \$version,
-           "host=s"     => \$host, 
-        #   "species_name=s"    => \$sname, 
+           "url=s"      => \$url, 
            "domain_list=s" => \$domainList, 
            "evidence_code_list=s" => \$ecList,
            "test_type=s" => \$type,
@@ -89,14 +82,13 @@ if($help)
 {
     print <<MAN;
     DESCRIPTION
-	For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts five parameters: Species name, a list of gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular componenet"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test. Also, if input species is not provided then by default Arabidopsis thaliana is considered to the input species.
+	For a given list of Features from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your feature-set. This function accepts four parameters: A list of gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular componenet"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric" and "chisq"). The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the gene-id to go-ids mapping is used to calculate GO Enrichment using hypergeometric or chi-square test. Also, if input species is not provided then by default Arabidopsis thaliana is considered to the input species.
 MAN
 
 	print "$usage\n";
 	print "\n";
 	print "General options\n";
-	print "\t--host=[xxx.xxx.xx.xxx:xxxx]\t\thostname of the server\n";
-	print "\t--species_name=[xxx,yyy,zzz,...]\t\tspecies name list (comma separated)\n";
+    print "\t--url=[http://kbase.us/services/ontology_service]\t\turl of the server\n";
 	print "\t--domain_list=[biological_process,molecular_function,cellular_component]\t\tdomain list (comma separated)\n";
 	print "\t--evidence_code_list=[XXX,YYY,ZZZ,...]\t\tGO evidence code list (comma separated)\n";
 	print "\t--test_type=[hypergeometric|chisq]\t\tthe types of test\n";
@@ -104,11 +96,9 @@ MAN
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo AT1G71695.1 | $0 --host=x.x.x.x:x \n";
+	print "echo "kb|g.3899.locus.2366" | $0\n";
 	print "\n\n";
-	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'| get_go_enrichment --host=localhost:7062";
-#	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 | $0 --evidence_code=IEA --host=x.x.x.x:7062 --p_value=xxx \n";
-#	print "echo AT1G03010.1,AT1G02830.1,AT1G03390.1,AT1G03400.1,AT1G71695.1,AT1G04450.1,AT1G05910.1,AT1G07270.1,AT1G09770.1,AT2G01650.1,AT2G03570.1 |perl scripts/getGOEnrichment.pl --p_value=0.05  --host=localhost:7062";
+	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'| get_go_enrichment\n";
 	print "\n\n";
 	print "$0 --help\tprint out help\n";
 	print "\n";
@@ -132,15 +122,13 @@ if($version)
 
 die $usage unless @ARGV == 0;
 
-my $oc = Bio::KBase::OntologyService::Client->new("http://".$host);
+my $oc = Bio::KBase::OntologyService::Client->new($url);
 my @dl = split/,/, $domainList;
 my @el = split/,/, $ecList;
 my @input = <STDIN>;
 my $istr = join(" ", @input);
 $istr =~ s/[,]/ /g;
 @input = split /\s+/, $istr;
-#$sname="Athaliana" if $istr =~/g\.3899/;
-#$sname="Ptrichocarpa" if $istr =~/g\.3907/;
 
 my $results = $oc->get_go_enrichment( \@input, \@dl, \@el, $type, $ontologytype);
 

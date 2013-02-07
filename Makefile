@@ -4,7 +4,7 @@ TARGET = /kb/deployment
 SERVICE_SPEC = Ontologies.spec
 SERVICE_NAME = OntologyService
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
-SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
+SERVICE_DIR = $(TARGET)/services/ontology_service
 SERVER_MODULE = lib/Bio/KBase/OntologyService/Service.pm
 #SERVICE = OntologyService
 SERVICE_PORT = 7062
@@ -201,13 +201,13 @@ deploy-dir:
 	mkdir -p $(SERVICE_DIR)/webroot
 
 deploy-monit:
-	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(TARGET)/services/$(SERVICE_NAME)/process.$(SERVICE_NAME)
+	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(SERVICE_DIR)/process.$(SERVICE_NAME)
 
 deploy-services:
-	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(TARGET)/services/$(SERVICE_NAME)/start_service
-	chmod +x $(TARGET)/services/$(SERVICE_NAME)/start_service
-	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(TARGET)/services/$(SERVICE_NAME)/stop_service
-	chmod +x $(TARGET)/services/$(SERVICE_NAME)/stop_service
+	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(SERVICE_DIR)/start_service
+	chmod +x $(SERVICE_DIR)/start_service
+	$(TPAGE) $(TPAGE_ARGS) service/stop_service.tt > $(SERVICE_DIR)/stop_service
+	chmod +x $(SERVICE_DIR)/stop_service
 
 
 # Deploying docs here refers to the deployment of documentation
