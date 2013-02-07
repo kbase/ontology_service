@@ -10,7 +10,7 @@ SERVER_MODULE = lib/Bio/KBase/OntologyService/Service.pm
 SERVICE_PORT = 7062
 
 TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
-TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) \
+TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=ontology_service \
         --define kb_service_port=$(SERVICE_PORT)
 
 #include $(TOP_DIR)/tools/Makefile.common
