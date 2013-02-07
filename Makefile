@@ -5,7 +5,7 @@ SERVICE_SPEC = Ontologies.spec
 SERVICE_NAME = OntologyService
 SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVICE_DIR = $(TARGET)/services/ontology_service
-SERVER_MODULE = lib/Bio/KBase/OntologyService/Service.pm
+SERVER_MODULE = lib/Bio/KBase/$(SERVICE_NAME)/Service.pm
 #SERVICE = OntologyService
 SERVICE_PORT = 7062
 
@@ -201,7 +201,7 @@ deploy-dir:
 	mkdir -p $(SERVICE_DIR)/webroot
 
 deploy-monit:
-	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(SERVICE_DIR)/process.$(SERVICE_NAME)
+	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(SERVICE_DIR)/process.ontology_service
 
 deploy-services:
 	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(SERVICE_DIR)/start_service
