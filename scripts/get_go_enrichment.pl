@@ -25,10 +25,10 @@ For a given list of Features from a particular genome (for example "Athaliana" )
 
 =over 6
 
-=item B<--url> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
+=item B<-u> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
 url of the server
 
-=item B<--help>
+=item B<-h> B<--help>
 prints help information
 
 =item B<--version>
