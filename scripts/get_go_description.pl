@@ -5,7 +5,7 @@ use Getopt::Long;
 
 =head1 NAME
 
-get_go_description - get GO id description
+get_go_description - get GO id description for a list of GO ids
 
 =head1 SYNOPSIS
 
@@ -13,13 +13,11 @@ get_go_description [--url=http://kbase.us/services/ontology_service] < GO_IDs
 
 =head1 DESCRIPTION
 
-The standard input should be space character separated go ids.
-This is a pipe command. The input is taken from the standard input, and the
-output is to the standard output.
+Use this function to perform GO description for a set of GO ids.  
 
 =head2 Documentation for underlying call
 
-Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (white space or comman separated) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
+    Extract GO term description for a given list of GO identifiers. This function expects an input list of GO-ids (white space or comman separated) and returns a table of three columns, first column being the GO ids,  the second column is the GO description and third column is GO domain (biological process, molecular function, cellular component). 
 
 =head1 OPTIONS
 
@@ -57,7 +55,7 @@ if($help)
 {
     print <<MAN;
     DESCRIPTION
-	Extract GO term description for a given list of go-identifiers. This function expects an input list of go-ids (white space or comman separated) and returns a table of two columns, first column being the go-id and the second column being the go-term description.
+	Extract GO term description for a given list of GO identifiers. This function expects an input list of GO-ids (white space or comman separated) and returns a table of three columns, first column being the GO ids,  the second column is the GO description and third column is GO domain (biological process, molecular function, cellular component).  
 MAN
 
 	print "$usage\n";
