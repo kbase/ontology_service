@@ -23,7 +23,7 @@ Use this function to perform GO description for a set of GO ids.
 
 =over 6
 
-=item B<--url> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>     
+=item B<-u> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>     
 the url of the service
 
 =item B<--help>                                                             

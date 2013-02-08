@@ -25,7 +25,7 @@ This function call accepts three parameters: a list of kbase gene-identifiers, a
 
 =over 6
 
-=item B<--url> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
+=item B<-u> I<[http://kbase.us/services/ontology_service]> B<--url>=I<[http://kbase.us/services/ontology_service]>
 url of the server
 
 
