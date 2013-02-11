@@ -96,7 +96,7 @@ MAN
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo "kb|g.3899.locus.2366" | $0\n";
+	print "echo 'kb|g.3899.locus.2366' | $0\n";
 	print "\n\n";
 	print " echo  'kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229'| get_go_enrichment\n";
 	print "\n\n";
