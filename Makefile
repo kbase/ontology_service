@@ -222,6 +222,11 @@ deploy-docs: build-docs
 # compile_typespec command is called in the build-libs target.
 build-docs: compile-docs
 	mkdir -p docs; pod2html --infile=lib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
+	for src in $(SRC_PERL) ; do \
+		basefile=`basename $$src`; \
+		base=`basename $$src .pl`; \
+		pod2html $$src > docs/$$base.html ; \
+	done
 
 # Use this if you want to unlink the generation of the docs from
 # the generation of the libs. Not recommended, but could be a

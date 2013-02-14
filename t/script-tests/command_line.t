@@ -24,7 +24,7 @@ my $gene_list='kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb
 
 note("Create Test::Cmd objects for all of the scripts");
 
-my $getgodes = Test::Cmd->new(prog => "$bin/get_go_description.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
+my $getgodes = Test::Cmd->new(prog => "get_go_description");
 ok($getgodes, "creating Test::Cmd object for get_go_description.pl");
 
 my $getgoenrich = Test::Cmd->new(prog => "$bin/get_go_enrichment.pl", workdir => '', interpreter => '/kb/runtime/bin/perl');
