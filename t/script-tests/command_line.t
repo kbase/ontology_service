@@ -5,14 +5,22 @@
 
 use strict;
 use warnings;
+use lib "lib";
+use lib "t/script-tests";
 
 use Test::More tests => 15;
 use Test::Cmd;
 use String::Random qw(random_regex random_string);
 use JSON;
 
+# 
+#  Test - Use the auto start/stop service
+#
+ use Server;
+note("Create new service");
+my ($pid, $host) = Server::start('OntologyService');
+note("Test use:'".$host."' with PID=$pid");
 
-my $host = "http://localhost:7062";
 my $bin  = "scripts";
 my $goid="GO:0006979";
 #my $genelist="AT1G03010.1";
@@ -85,7 +93,9 @@ $line=join"\t",@tem;
 ok($line!~/cytochrome-c/ && $line =~ /aerobic respiration/, "Evidence code applied");
 
 
+Server::stop($pid);
 
+done_testing();
 
 
 
