@@ -1,3 +1,2 @@
-#group-name	pe	Plant Expression Service
-#command-set	scripts/(.*).pl	pe
-#command-set	scripts/(.*).r	pe
+#group-name	os	Ontology Service
+#command-set	scripts/(.*).pl	os
