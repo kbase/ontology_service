@@ -51,7 +51,7 @@ sub new
   $params{'mysqldb-host'} = 'devdb1.newyork.kbase.us' if! defined $params{'mysqldb-host'};
   $params{dbname} = 'kbase_plant' if! defined $params{dbname};
   $params{dbuser} = 'networks_pdev' if! defined $params{dbuser};
-  $params{dbpass} = '';# if! defined $params{dbpass};
+  $params{dbpass} = '' if! defined $params{dbpass};
   $params{dbport} = '3306' if! defined $params{dbport};
 
   my $dbh = DBI->connect("DBI:mysql:$params{dbname};host=$params{'mysqldb-host'};port=$params{dbport}","$params{dbuser}", "$params{dbpass}",  { RaiseError => 1, mysql_auto_reconnect => 1 } );
