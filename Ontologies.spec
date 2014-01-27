@@ -27,12 +27,18 @@ module Ontology : Ontology
 
   /* GoID : Unique GO term id (Source: external Gene Ontology database - http://www.geneontology.org/) */
   typedef string GoID;
+  /* GoID : Unique GO term id (Source: external Gene Ontology database - http://www.geneontology.org/) */
+  typedef string ontology_id;
 
   /* GoDesc : Human readable text description of the corresponding GO term */
   typedef string GoDesc;
+  /* GoDesc : Human readable text description of the corresponding GO term */
+  typedef string ontology_description;
 
   /* Unique identifier of a species specific Gene (aka Feature entity in KBase parlence). This ID is an external identifier that exists in the public databases such as Gramene, Ensembl, NCBI etc. */ 
   typedef string GeneID;
+  /* Unique identifier of a species specific Gene (aka Feature entity in KBase parlence). This ID is an external identifier that exists in the public databases such as Gramene, Ensembl, NCBI etc. */ 
+  typedef string gene_id;
 
   /* Evidence code indicates how the annotation to a particular term is supported. 
      The list of evidence codes includes Experimental, Computational Analysis, Author statement, Curator statement, Automatically assigned and Obsolete evidence codes. This list will be useful in selecting the correct evidence code for an annotation. The details are given below: 
@@ -73,26 +79,78 @@ module Ontology : Ontology
     
 */
   typedef string EvidenceCode;
+  /* Evidence code indicates how the annotation to a particular term is supported. 
+     The list of evidence codes includes Experimental, Computational Analysis, Author statement, Curator statement, Automatically assigned and Obsolete evidence codes. This list will be useful in selecting the correct evidence code for an annotation. The details are given below: 
+
+     +  Experimental Evidence Codes
+     EXP: Inferred from Experiment
+     IDA: Inferred from Direct Assay
+     IPI: Inferred from Physical Interaction
+     IMP: Inferred from Mutant Phenotype
+     IGI: Inferred from Genetic Interaction
+     IEP: Inferred from Expression Pattern
+    
+     + Computational Analysis Evidence Codes
+     ISS: Inferred from Sequence or Structural Similarity
+     ISO: Inferred from Sequence Orthology
+     ISA: Inferred from Sequence Alignment
+     ISM: Inferred from Sequence Model
+     IGC: Inferred from Genomic Context
+     IBA: Inferred from Biological aspect of Ancestor
+     IBD: Inferred from Biological aspect of Descendant
+     IKR: Inferred from Key Residues
+     IRD: Inferred from Rapid Divergence
+     RCA: inferred from Reviewed Computational Analysis
+    
+     + Author Statement Evidence Codes
+     TAS: Traceable Author Statement
+     NAS: Non-traceable Author Statement
+    
+     + Curator Statement Evidence Codes
+     IC: Inferred by Curator
+     ND: No biological Data available
+    
+     + Automatically-assigned Evidence Codes
+     IEA: Inferred from Electronic Annotation
+    
+     + Obsolete Evidence Codes
+     NR: Not Recorded
+    
+*/
+  typedef string evidence_code;
 
   /* Captures which branch of knowledge the GO terms refers to e.g. "biological_process", "molecular_function", "cellular_component" etc. */
   typedef string Domain;
+  /* Captures which branch of knowledge the GO terms refers to e.g. "biological_process", "molecular_function", "cellular_component" etc. */
+  typedef string domain;
 
   /* Test type, whether it's "hypergeometric" and "chisq"  */
   typedef string TestType;
+  /* Test type, whether it's "hypergeometric" and "chisq"  */
+  typedef string test_type;
 
   /* A list of ontology identifiers */
   typedef list<GoID> GoIDList;
+  /* A list of ontology identifiers */
+  typedef list<ontology_id> ontology_id_list;
 
   /* a list of GO terms description */
   typedef list<GoDesc> GoDescList;
+  /* a list of GO terms description */
+  typedef list<ontology_description> ontology_description_list;
 
   /* A list of gene identifiers from same species */
   typedef list<GeneID> GeneIDList;
+  /* A list of gene identifiers from same species */
+  typedef list<gene_id> gene_id_list;
 
   /* A list of ontology domains */
   typedef list<Domain> DomainList;
+  /* A list of ontology domains */
+  typedef list<domain> domain_list;
 
   typedef list<string> StringArray;
+  typedef list<string> string_list;
 
   /* A list of ontology term evidence codes. One ontology term can have one or more evidence codes. */
   typedef list<EvidenceCode> EvidenceCodeList;
@@ -121,6 +179,27 @@ module Ontology : Ontology
 
   /* A list of ontology enrichment objects */
   typedef list<Enrichment> EnrichmentList;
+
+  /*
+	Structure for OntologyAnnotation object 
+	@optional p_value
+  */ 
+typedef structure {
+	string ontology_id;
+	string ontology_type;
+	string ontology_description;
+	string p_value;
+} OntologyAnnotation;
+
+typedef list<OntologyAnnotation> ontology_annotation_list;
+
+/*
+	Structure for GeneAnnotations
+*/
+typedef structure {
+mapping<gene_id, ontology_annotation_list> gene_enrichment_annotations;
+} GeneAnnotations;
+ 
   
 
 /*  This function call accepts three parameters: a list of kbase gene-identifiers, a list of ontology domains, and a list of evidence codes. The list of gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of the last two lists is not empty then the gene-id and go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Finally, this function returns a mapping of kbase gene id to go-ids along with go-description, ontology domain, and evidence code; note that in the returned table of results, each gene-id is associated with a list of one of more go-ids. Also, if no species is provided as input then by default, Arabidopsis thaliana is used as the input species.  */
@@ -131,4 +210,9 @@ module Ontology : Ontology
 
 /*  For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05. Also, if input species is not provided then by default Arabidopsis thaliana is considered the input species. The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. */
   funcdef get_go_enrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type,ontology_type ontologytype) returns (EnrichmentList results);  
+
+
+/* Returns the precomputed annotation with validation GO terms */
+  funcdef get_go_annotation(GeneIDList geneIDList) returns (GeneAnnotations results);
+
 };

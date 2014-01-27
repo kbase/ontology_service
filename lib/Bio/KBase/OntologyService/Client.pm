@@ -145,8 +145,9 @@ sub get_goidlist
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_goidlist',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -231,8 +232,9 @@ sub get_go_description
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_go_description',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -353,8 +355,9 @@ sub get_go_enrichment
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{code},
+					       code => $result->content->{error}->{code},
 					       method_name => 'get_go_enrichment',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
@@ -363,6 +366,109 @@ sub get_go_enrichment
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_go_enrichment",
 					    status_line => $self->{client}->status_line,
 					    method_name => 'get_go_enrichment',
+				       );
+    }
+}
+
+
+
+=head2 get_go_annotation
+
+  $results = $obj->get_go_annotation($geneIDList)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$geneIDList is a GeneIDList
+$results is a GeneAnnotations
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+GeneAnnotations is a reference to a hash where the following keys are defined:
+	gene_enrichment_annotations has a value which is a reference to a hash where the key is a gene_id and the value is an ontology_annotation_list
+gene_id is a string
+ontology_annotation_list is a reference to a list where each element is an OntologyAnnotation
+OntologyAnnotation is a reference to a hash where the following keys are defined:
+	ontology_id has a value which is a string
+	ontology_type has a value which is a string
+	ontology_description has a value which is a string
+	p_value has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$geneIDList is a GeneIDList
+$results is a GeneAnnotations
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+GeneAnnotations is a reference to a hash where the following keys are defined:
+	gene_enrichment_annotations has a value which is a reference to a hash where the key is a gene_id and the value is an ontology_annotation_list
+gene_id is a string
+ontology_annotation_list is a reference to a list where each element is an OntologyAnnotation
+OntologyAnnotation is a reference to a hash where the following keys are defined:
+	ontology_id has a value which is a string
+	ontology_type has a value which is a string
+	ontology_description has a value which is a string
+	p_value has a value which is a string
+
+
+=end text
+
+=item Description
+
+Returns the precomputed annotation with validation GO terms
+
+=back
+
+=cut
+
+sub get_go_annotation
+{
+    my($self, @args) = @_;
+
+# Authentication: none
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_go_annotation (received $n, expecting 1)");
+    }
+    {
+	my($geneIDList) = @args;
+
+	my @_bad_arguments;
+        (ref($geneIDList) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"geneIDList\" (value was \"$geneIDList\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_go_annotation:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_go_annotation');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Ontology.get_go_annotation",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_go_annotation',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_go_annotation",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_go_annotation',
 				       );
     }
 }
@@ -380,16 +486,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_go_enrichment',
+                method_name => 'get_go_annotation',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_go_enrichment",
+            error => "Error invoking method get_go_annotation",
             status_line => $self->{client}->status_line,
-            method_name => 'get_go_enrichment',
+            method_name => 'get_go_annotation',
         );
     }
 }
@@ -503,6 +609,37 @@ a string
 
 
 
+=head2 ontology_id
+
+=over 4
+
+
+
+=item Description
+
+GoID : Unique GO term id (Source: external Gene Ontology database - http://www.geneontology.org/)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 GoDesc
 
 =over 4
@@ -534,7 +671,69 @@ a string
 
 
 
+=head2 ontology_description
+
+=over 4
+
+
+
+=item Description
+
+GoDesc : Human readable text description of the corresponding GO term
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 GeneID
+
+=over 4
+
+
+
+=item Description
+
+Unique identifier of a species specific Gene (aka Feature entity in KBase parlence). This ID is an external identifier that exists in the public databases such as Gramene, Ensembl, NCBI etc.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 gene_id
 
 =over 4
 
@@ -631,7 +830,104 @@ a string
 
 
 
+=head2 evidence_code
+
+=over 4
+
+
+
+=item Description
+
+Evidence code indicates how the annotation to a particular term is supported. 
+The list of evidence codes includes Experimental, Computational Analysis, Author statement, Curator statement, Automatically assigned and Obsolete evidence codes. This list will be useful in selecting the correct evidence code for an annotation. The details are given below: 
+
++  Experimental Evidence Codes
+EXP: Inferred from Experiment
+IDA: Inferred from Direct Assay
+IPI: Inferred from Physical Interaction
+IMP: Inferred from Mutant Phenotype
+IGI: Inferred from Genetic Interaction
+IEP: Inferred from Expression Pattern
+    
++ Computational Analysis Evidence Codes
+ISS: Inferred from Sequence or Structural Similarity
+ISO: Inferred from Sequence Orthology
+ISA: Inferred from Sequence Alignment
+ISM: Inferred from Sequence Model
+IGC: Inferred from Genomic Context
+IBA: Inferred from Biological aspect of Ancestor
+IBD: Inferred from Biological aspect of Descendant
+IKR: Inferred from Key Residues
+IRD: Inferred from Rapid Divergence
+RCA: inferred from Reviewed Computational Analysis
+    
++ Author Statement Evidence Codes
+TAS: Traceable Author Statement
+NAS: Non-traceable Author Statement
+    
++ Curator Statement Evidence Codes
+IC: Inferred by Curator
+ND: No biological Data available
+    
++ Automatically-assigned Evidence Codes
+IEA: Inferred from Electronic Annotation
+    
++ Obsolete Evidence Codes
+NR: Not Recorded
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 Domain
+
+=over 4
+
+
+
+=item Description
+
+Captures which branch of knowledge the GO terms refers to e.g. "biological_process", "molecular_function", "cellular_component" etc.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
+=head2 domain
 
 =over 4
 
@@ -693,6 +989,37 @@ a string
 
 
 
+=head2 test_type
+
+=over 4
+
+
+
+=item Description
+
+Test type, whether it's "hypergeometric" and "chisq"
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a string
+</pre>
+
+=end html
+
+=begin text
+
+a string
+
+=end text
+
+=back
+
+
+
 =head2 GoIDList
 
 =over 4
@@ -717,6 +1044,37 @@ a reference to a list where each element is a GoID
 =begin text
 
 a reference to a list where each element is a GoID
+
+=end text
+
+=back
+
+
+
+=head2 ontology_id_list
+
+=over 4
+
+
+
+=item Description
+
+A list of ontology identifiers
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ontology_id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ontology_id
 
 =end text
 
@@ -755,6 +1113,37 @@ a reference to a list where each element is a GoDesc
 
 
 
+=head2 ontology_description_list
+
+=over 4
+
+
+
+=item Description
+
+a list of GO terms description
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an ontology_description
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an ontology_description
+
+=end text
+
+=back
+
+
+
 =head2 GeneIDList
 
 =over 4
@@ -779,6 +1168,37 @@ a reference to a list where each element is a GeneID
 =begin text
 
 a reference to a list where each element is a GeneID
+
+=end text
+
+=back
+
+
+
+=head2 gene_id_list
+
+=over 4
+
+
+
+=item Description
+
+A list of gene identifiers from same species
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a gene_id
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a gene_id
 
 =end text
 
@@ -817,7 +1237,64 @@ a reference to a list where each element is a Domain
 
 
 
+=head2 domain_list
+
+=over 4
+
+
+
+=item Description
+
+A list of ontology domains
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a domain
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a domain
+
+=end text
+
+=back
+
+
+
 =head2 StringArray
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is a string
+
+=end text
+
+=back
+
+
+
+=head2 string_list
 
 =over 4
 
@@ -1075,6 +1552,109 @@ a reference to a list where each element is an Enrichment
 =begin text
 
 a reference to a list where each element is an Enrichment
+
+=end text
+
+=back
+
+
+
+=head2 OntologyAnnotation
+
+=over 4
+
+
+
+=item Description
+
+Structure for OntologyAnnotation object 
+@optional p_value
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ontology_id has a value which is a string
+ontology_type has a value which is a string
+ontology_description has a value which is a string
+p_value has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ontology_id has a value which is a string
+ontology_type has a value which is a string
+ontology_description has a value which is a string
+p_value has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ontology_annotation_list
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list where each element is an OntologyAnnotation
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list where each element is an OntologyAnnotation
+
+=end text
+
+=back
+
+
+
+=head2 GeneAnnotations
+
+=over 4
+
+
+
+=item Description
+
+Structure for GeneAnnotations
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+gene_enrichment_annotations has a value which is a reference to a hash where the key is a gene_id and the value is an ontology_annotation_list
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+gene_enrichment_annotations has a value which is a reference to a hash where the key is a gene_id and the value is an ontology_annotation_list
+
 
 =end text
 
