@@ -1,2 +1,2 @@
-#group-name	os	Ontology Service
+#group-name	os	Ontology
 #command-set	scripts/(.*).pl	os
