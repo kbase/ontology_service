@@ -151,7 +151,7 @@ module KBaseOntology {
 
 	typedef mapping<ontology_acc, OntologyTermAnnotation> ontology_term_annotation_map;
 
-	typedef	mapping<gene_id, ontology_annotation_map> gene_annotation_map;
+	typedef	mapping<gene_id, ontology_term_annotation_map> gene_annotation_map;
 
 	/*
 		Structure for GeneOntologyAnnotations
