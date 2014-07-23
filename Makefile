@@ -2,15 +2,16 @@ TOP_DIR = ../..
 DEPLOY_RUNTIME = /kb/runtime
 TARGET = /kb/deployment
 SERVICE_SPEC = Ontologies.spec
-SERVICE_NAME = OntologyService
+SERVICE_NAME = ontology_service
+MODULE_NAME = OntologyService
 SERVICE_PSGI_FILE = ontology_service.psgi
-SERVICE_DIR = $(TARGET)/services/ontology_service
-SERVER_MODULE = lib/Bio/KBase/$(SERVICE_NAME)/Service.pm
+SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
+SERVER_MODULE = lib/Bio/KBase/$(MODULE_NAME)/Service.pm
 #SERVICE = OntologyService
 SERVICE_PORT = 7062
 
 TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
-TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=ontology_service \
+TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME} \
         --define kb_service_port=$(SERVICE_PORT)
 
 #include $(TOP_DIR)/tools/Makefile.common
@@ -201,7 +202,7 @@ deploy-dir:
 	mkdir -p $(SERVICE_DIR)/webroot
 
 deploy-monit:
-	$(TPAGE) $(TPAGE_ARGS) service/process.$(SERVICE_NAME).tt > $(SERVICE_DIR)/process.ontology_service
+	$(TPAGE) $(TPAGE_ARGS) service/process.$(MODULE_NAME).tt > $(SERVICE_DIR)/process.ontology_service
 
 deploy-services:
 	$(TPAGE) $(TPAGE_ARGS) service/start_service.tt > $(SERVICE_DIR)/start_service
@@ -221,7 +222,7 @@ deploy-docs: build-docs
 # that is provided to the compile_typespec command. The
 # compile_typespec command is called in the build-libs target.
 build-docs: compile-docs
-	mkdir -p docs; pod2html --infile=lib/Bio/KBase/$(SERVICE_NAME)/Client.pm --outfile=docs/$(SERVICE_NAME).html
+	mkdir -p docs; pod2html --infile=lib/Bio/KBase/$(MODULE_NAME)/Client.pm --outfile=docs/$(MODULE_NAME).html
 	for src in $(SRC_PERL) ; do \
 		basefile=`basename $$src`; \
 		base=`basename $$src .pl`; \
@@ -246,11 +247,11 @@ build-libs:
 	mkdir -p scripts 
 	compile_typespec \
 		--psgi $(SERVICE_PSGI_FILE) \
-		--impl Bio::KBase::$(SERVICE_NAME)::$(SERVICE_NAME)Impl \
-		--service Bio::KBase::$(SERVICE_NAME)::Service \
-		--client Bio::KBase::$(SERVICE_NAME)::Client \
-		--py biokbase/$(SERVICE_NAME)/Client \
-		--js javascript/$(SERVICE_NAME)/Client \
+		--impl Bio::KBase::$(MODULE_NAME)::$(MODULE_NAME)Impl \
+		--service Bio::KBase::$(MODULE_NAME)::Service \
+		--client Bio::KBase::$(MODULE_NAME)::Client \
+		--py biokbase/$(MODULE_NAME)/Client \
+		--js javascript/$(MODULE_NAME)/Client \
 		$(SERVICE_SPEC) lib
 
 #		--scripts scripts \ # automatically generated script is not working
