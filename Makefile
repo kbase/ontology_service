@@ -7,11 +7,11 @@ MODULE_NAME = OntologyService
 SERVICE_PSGI_FILE = ontology_service.psgi
 SERVICE_DIR = $(TARGET)/services/$(SERVICE_NAME)
 SERVER_MODULE = lib/Bio/KBase/$(MODULE_NAME)/Service.pm
-#SERVICE = OntologyService
 SERVICE_PORT = 7062
+#SERVICE = OntologyService
 
 TPAGE = $(DEPLOY_RUNTIME)/bin/tpage
-TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME} \
+TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --define kb_service_name=$(SERVICE_NAME) \
         --define kb_service_port=$(SERVICE_PORT)
 
 #include $(TOP_DIR)/tools/Makefile.common
