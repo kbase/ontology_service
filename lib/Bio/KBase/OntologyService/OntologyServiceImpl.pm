@@ -107,10 +107,10 @@ sub new
     if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {  
       my $service = $ENV{KB_SERVICE_NAME};
       if (defined($service)) {
-        my $c = Config::Simple->new();
-        $c->read($e);
+        my %Config = ();
+        tie %Config, "Config::Simple", "$e";
         for my $p (@list) {
-          my $v = $c->param("$service.$p");
+          my $v = $Config{"$service.$p"};
           if ($v) {
             $params{$p} = $v;
           }
