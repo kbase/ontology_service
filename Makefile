@@ -58,7 +58,7 @@ SERVER_TESTS = $(wildcard t/server-tests/*.t)
 # A smiliar naming convention is used for tests. 
 
 
-default:
+default: build-libs
 
 # Test Section
 

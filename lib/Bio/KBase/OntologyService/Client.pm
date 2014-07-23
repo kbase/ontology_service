@@ -5,6 +5,7 @@ use strict;
 use Data::Dumper;
 use URI;
 use Bio::KBase::Exceptions;
+use Bio::KBase::AuthToken;
 
 # Client version should match Impl version
 # This is a Semantic Version number,
@@ -33,6 +34,20 @@ sub new
 	url => $url,
     };
 
+    #
+    # This module requires authentication.
+    #
+    # We create an auth token, passing through the arguments that we were (hopefully) given.
+
+    {
+	my $token = Bio::KBase::AuthToken->new(@args);
+	
+	if (!$token->error_message)
+	{
+	    $self->{token} = $token->token;
+	    $self->{client}->{token} = $token->token;
+	}
+    }
 
     my $ua = $self->{client}->ua;	 
     my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
@@ -117,7 +132,7 @@ sub get_goidlist
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 3)
     {
@@ -206,7 +221,7 @@ sub get_go_description
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -315,7 +330,8 @@ GoDesc is a string
 
 =item Description
 
-For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05. Also, if input species is not provided then by default Arabidopsis thaliana is considered the input species. The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
+For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05.  
+The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
 
 =back
 
@@ -325,7 +341,7 @@ sub get_go_enrichment
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 5)
     {
@@ -432,7 +448,7 @@ sub get_go_annotation
 {
     my($self, @args) = @_;
 
-# Authentication: none
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -475,6 +491,114 @@ sub get_go_annotation
 
 
 
+=head2 association_test
+
+  $results = $obj->association_test($gene_list, $ws_name, $in_obj_id, $out_obj_id, $type, $correction_method, $cut_off)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$gene_list is a GeneIDList
+$ws_name is a string
+$in_obj_id is a string
+$out_obj_id is a string
+$type is a TestType
+$correction_method is a string
+$cut_off is a float
+$results is a reference to a hash where the key is a string and the value is a string
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+TestType is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$gene_list is a GeneIDList
+$ws_name is a string
+$in_obj_id is a string
+$out_obj_id is a string
+$type is a TestType
+$correction_method is a string
+$cut_off is a float
+$results is a reference to a hash where the key is a string and the value is a string
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+TestType is a string
+
+
+=end text
+
+=item Description
+
+Association Test
+gene_list is tested against each cluster in a network typed object with test method (TestType) and p-value correction method (correction_method).
+The current correction_method is either "none" or "bonferroni" and the default is "none" if it is not specified.
+The current test type, by default, uses hypergeometric test. Even if you do not provide TestType, it will do hypergeometric test.
+
+=back
+
+=cut
+
+sub association_test
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 7)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function association_test (received $n, expecting 7)");
+    }
+    {
+	my($gene_list, $ws_name, $in_obj_id, $out_obj_id, $type, $correction_method, $cut_off) = @args;
+
+	my @_bad_arguments;
+        (ref($gene_list) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument 1 \"gene_list\" (value was \"$gene_list\")");
+        (!ref($ws_name)) or push(@_bad_arguments, "Invalid type for argument 2 \"ws_name\" (value was \"$ws_name\")");
+        (!ref($in_obj_id)) or push(@_bad_arguments, "Invalid type for argument 3 \"in_obj_id\" (value was \"$in_obj_id\")");
+        (!ref($out_obj_id)) or push(@_bad_arguments, "Invalid type for argument 4 \"out_obj_id\" (value was \"$out_obj_id\")");
+        (!ref($type)) or push(@_bad_arguments, "Invalid type for argument 5 \"type\" (value was \"$type\")");
+        (!ref($correction_method)) or push(@_bad_arguments, "Invalid type for argument 6 \"correction_method\" (value was \"$correction_method\")");
+        (!ref($cut_off)) or push(@_bad_arguments, "Invalid type for argument 7 \"cut_off\" (value was \"$cut_off\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to association_test:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'association_test');
+	}
+    }
+
+    my $result = $self->{client}->call($self->{url}, {
+	method => "Ontology.association_test",
+	params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'association_test',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method association_test",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'association_test',
+				       );
+    }
+}
+
+
+
 sub version {
     my ($self) = @_;
     my $result = $self->{client}->call($self->{url}, {
@@ -486,16 +610,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_go_annotation',
+                method_name => 'association_test',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_go_annotation",
+            error => "Error invoking method association_test",
             status_line => $self->{client}->status_line,
-            method_name => 'get_go_annotation',
+            method_name => 'association_test',
         );
     }
 }

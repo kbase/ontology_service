@@ -4,6 +4,7 @@ use Data::Dumper;
 use Moose;
 use JSON;
 use Bio::KBase::Log;
+use Bio::KBase::AuthToken;
 
 extends 'RPC::Any::Server::JSONRPC::PSGI';
 
@@ -20,9 +21,17 @@ our %return_counts = (
         'get_go_description' => 1,
         'get_go_enrichment' => 1,
         'get_go_annotation' => 1,
+        'association_test' => 1,
         'version' => 1,
 );
 
+our %method_authentication = (
+        'get_goidlist' => 'optional',
+        'get_go_description' => 'optional',
+        'get_go_enrichment' => 'optional',
+        'get_go_annotation' => 'optional',
+        'association_test' => 'optional',
+);
 
 
 sub _build_valid_methods
@@ -33,6 +42,7 @@ sub _build_valid_methods
         'get_go_description' => 1,
         'get_go_enrichment' => 1,
         'get_go_annotation' => 1,
+        'association_test' => 1,
         'version' => 1,
     };
     return $methods;
@@ -89,6 +99,7 @@ sub _build_loggers
             $submod, {}, {ip_address => 1, authuser => 1, module => 1,
             method => 1, call_id => 1,
             logfile => $loggers->{userlog}->get_log_file()});
+    $loggers->{serverlog}->set_log_level(6);
     return $loggers;
 }
 
@@ -156,7 +167,37 @@ sub call_method {
     
     my $args = $data->{arguments};
 
-    # Service Ontology does not require authentication.
+{
+    # Service Ontology requires authentication.
+
+    my $method_auth = $method_authentication{$method};
+    $ctx->authenticated(0);
+    if ($method_auth eq 'none')
+    {
+	# No authentication required here. Move along.
+    }
+    else
+    {
+	my $token = $self->_plack_req->header("Authorization");
+
+	if (!$token && $method_auth eq 'required')
+	{
+	    $self->exception('PerlError', "Authentication required for Ontology but no authentication header was passed");
+	}
+
+	my $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1);
+	my $valid = $auth_token->validate();
+	# Only throw an exception if authentication was required and it fails
+	if ($method_auth eq 'required' && !$valid)
+	{
+	    $self->exception('PerlError', "Token validation failed: " . $auth_token->error_message);
+	} elsif ($valid) {
+	    $ctx->authenticated(1);
+	    $ctx->user_id($auth_token->user_id);
+	    $ctx->token( $token);
+	}
+    }
+}
     my $new_isa = $self->get_package_isa($module);
     no strict 'refs';
     local @{"${module}::ISA"} = @$new_isa;

@@ -4,6 +4,7 @@
 module Ontology : Ontology
 {
 
+     authentication optional;
 /*
 
      Plant Species names.
@@ -208,11 +209,18 @@ mapping<gene_id, ontology_annotation_list> gene_enrichment_annotations;
 /*  Extract GO term description for a given list of GO identifiers. This function expects an input list of GO-ids (white space or comman separated) and returns a table of three columns, first column being the GO ids,  the second column is the GO description and third column is GO domain (biological process, molecular function, cellular component */
   funcdef get_go_description(GoIDList goIDList) returns (mapping<GoID, StringArray> results);
 
-/*  For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05. Also, if input species is not provided then by default Arabidopsis thaliana is considered the input species. The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. */
+/*  For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05.  
+  The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test. */
   funcdef get_go_enrichment(GeneIDList geneIDList, DomainList domainList, EvidenceCodeList ecList, TestType type,ontology_type ontologytype) returns (EnrichmentList results);  
 
 
 /* Returns the precomputed annotation with validation GO terms */
   funcdef get_go_annotation(GeneIDList geneIDList) returns (GeneAnnotations results);
 
+  /* Association Test
+     gene_list is tested against each cluster in a network typed object with test method (TestType) and p-value correction method (correction_method).
+     The current correction_method is either "none" or "bonferroni" and the default is "none" if it is not specified.
+     The current test type, by default, uses hypergeometric test. Even if you do not provide TestType, it will do hypergeometric test. 
+  */
+  funcdef association_test(GeneIDList gene_list, string ws_name, string in_obj_id, string out_obj_id, TestType type, string correction_method, float cut_off) returns (mapping<string,string> results);
 };

@@ -18,10 +18,81 @@ This module provides public interface/APIs for KBase gene ontology (GO) services
 #BEGIN_HEADER
 use DBI;
 use POSIX;
-use Bio::KBase::OntologyService::OntologySupport;
 use Text::NSP::Measures::2D::Fisher::twotailed;
 use Config::Simple;
+use JSON;
+use Bio::KBase::OntologyService::OntologySupport;
+use Bio::KBase::workspace::Client;
+use Bio::KBase::ERDB_Service::Client;
+use Bio::KBase::AuthToken;
+use Data::Dumper;
 #use IDServerAPIClient;
+sub compute_tot_num_genes {
+    my $self = shift;
+    my($gnid) = @_;
+
+    return if(defined $self->{total_genes}->{$gnid});
+
+    # precompute total number of genes
+    my $ec = Bio::KBase::ERDB_Service::Client->new($self->{_params}->{erdb_url});
+    my $rr = $ec->runSQL("select count(*) from Feature where id like '$gnid.%' and feature_type = 'CDS'", []);
+    $self->{total_genes}->{$gnid} = ${$$rr[0]}[0];
+}
+
+sub load_ont_anno4genome {
+    my $self = shift;
+    my($gnid) = @_;
+
+    return if(defined $self->{_cache}->{$gnid});
+
+    # TODO: It will be LRU based caching later or get_subobjects if it is really big
+    my $at =Bio::KBase::AuthToken->new(user_id=>$self->{_params}->{ws_un}, password => $self->{_params}->{ws_pw});
+    my $wsc = Bio::KBase::workspace::Client->new($self->{_params}->{ws_url}, token => $at->get());
+    eval{
+      my $rst = $wsc->get_object({workspace => $self->{_params}->{ws_id}, id  => $gnid});
+      $self->{_cache}->{$gnid}= $rst->{data}->{ga};
+
+      # precompute goid to gene count per species (ignore ec list for now) 
+      my %term2cnt = ();
+      my $gene2term = $rst->{data}->{ga};
+      foreach my $gene (keys %{$gene2term}) {
+          foreach my $term ( keys %{$gene2term->{$gene}}) {
+            $term2cnt{$term} = 0 if ! defined $term2cnt{$term};
+            $term2cnt{$term}++;
+          }
+      }
+      
+      $self->{term_genes}->{$gnid} = \%term2cnt;
+     
+      compute_tot_num_genes($self, $gnid);
+    }
+}
+
+sub load_ont {
+    my $self = shift;
+    my($ctx) = @_;
+
+    # TODO: Add refreshing logic later
+    return if(defined $self->{_ont});
+
+    my $at =Bio::KBase::AuthToken->new(user_id=>$self->{_params}->{ws_un}, password => $self->{_params}->{ws_pw});
+    my $wsc = Bio::KBase::workspace::Client->new($self->{_params}->{ws_url}, token => $at->get());
+    my $rst = $wsc->get_object({workspace => $self->{_params}->{ws_id}, id  => 'ontologies'});
+
+    if(defined $rst->{data}) {
+        $self->{_ont} = $rst->{data}->{ontology_acc_term_map};
+        return;
+    }
+
+    my $kb_top = $ENV{'KB_TOP'};  
+    $kb_top = '/kb/deployment' if ! defined $kb_top;
+    my $package = $ctx->{module};
+    open ONT, "$kb_top/services/$package/ontologies.json" or die "Couldn't open $kb_top/services/$package/ontologies.json";
+    my @lines = <ONT>;
+    my $file = join " ", @lines;
+    $self->{_ont} = from_json($file);
+
+}
 #END_HEADER
 
 sub new
@@ -31,32 +102,32 @@ sub new
     };
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
-  my %params;
-  my @list = qw(mysqldb-host dbname dbuser dbpass dbport);
-  if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {  
-    my $service = $ENV{KB_SERVICE_NAME};
-    if (defined($service)) {
-      my $c = Config::Simple->new();
-      $c->read($e);
-      for my $p (@list) {
-        my $v = $c->param("$service.$p");
-        if ($v) {
-          $params{$p} = $v;
+    my %params;
+    my @list = qw(ws_url, ws_un, ws_pw, ws_id, ws_type, erdb_url);
+    if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {  
+      my $service = $ENV{KB_SERVICE_NAME};
+      if (defined($service)) {
+        my $c = Config::Simple->new();
+        $c->read($e);
+        for my $p (@list) {
+          my $v = $c->param("$service.$p");
+          if ($v) {
+            $params{$p} = $v;
+          }
         }
       }
     }
-  }
+ 
+    # set default values for testing
+    $params{erdb_url} = 'http://kbase.us/services/erdb_service' if! defined $params{erdb_url};
+    $params{ws_url} = 'https://kbase.us/services/ws' if! defined $params{ws_url};
+    $params{ws_un} = 'kbasetest' if! defined $params{ws_un};
+    #$params{ws_pw} = '' if! defined $params{ws_pw};
+    $params{ws_id} = 'ont_upload' if! defined $params{ws_id};
+    $params{ws_type} = 'KBaseOntology.GeneOntologyAnnotation-1.0' if! defined $params{ws_type};
 
-  # set default values for testing
-  $params{'mysqldb-host'} = 'devdb1.newyork.kbase.us' if! defined $params{'mysqldb-host'};
-  $params{dbname} = 'kbase_plant' if! defined $params{dbname};
-  $params{dbuser} = 'networks_pdev' if! defined $params{dbuser};
-  $params{dbpass} = '' if! defined $params{dbpass};
-  $params{dbport} = '3306' if! defined $params{dbport};
-
-  my $dbh = DBI->connect("DBI:mysql:$params{dbname};host=$params{'mysqldb-host'};port=$params{dbport}","$params{dbuser}", "$params{dbpass}",  { RaiseError => 1, mysql_auto_reconnect => 1 } );
-  #$dbh->{mysql_auto_reconnect} = 1;
-  $self->{_dbh} = $dbh;
+    $self->{_params}=\%params;
+    $self->{_cache}={};
     #END_CONSTRUCTOR
 
     if ($self->can('_init_instance'))
@@ -158,28 +229,36 @@ sub get_goidlist
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN get_goidlist
-  my $dbh = $self->{_dbh};
 
     my %domainMap = map {$_ => 1} @{$domainList};
     my %ecMap = map {$_ => 1} @{$ecList};
 
     my %g2idlist = (); # gene to id list
     $results = \%g2idlist;
-    my $pstmt_exc = $dbh->prepare("select DISTINCT OntologyID, OntologyDescription, OntologyDomain, OntologyEvidenceCode from ontologies_int where kblocusid = ? and OntologyType = 'GO'");
-    my $pstmt;
-    foreach my $geneID (@{$geneIDList}) {
 
-      $pstmt_exc->bind_param(1, $geneID);
-      $pstmt_exc->execute();
-      $pstmt = $pstmt_exc;
-      while( my @data = $pstmt->fetchrow_array()) {
-        next if (! defined $domainMap{$data[2]}) && ($#$domainList > -1);
-        next if (! defined $ecMap{$data[3]}) && ($#$ecList > -1);
-        $g2idlist{$geneID} = {} if(! defined $g2idlist{$geneID}) ;
-        $g2idlist{$geneID}->{$data[0]} = [] if(! defined $g2idlist{$geneID}->{$data[0]});
-        push $g2idlist{$geneID}->{$data[0]}, {'domain' => $data[2], 'ec' => $data[3], 'desc' => $data[1]};
-      } # end of fetch and counting
-    } # end of types
+    my $gncache = $self->{_cache};
+    my $n_dl = @$domainList;
+    my $n_ec = @$ecList;
+    foreach my $geneID (@{$geneIDList}) {
+      if($geneID =~ m/^(kb\|g\.\d+)/) {
+        my $gnid = $1;
+        load_ont_anno4genome($self, $gnid) if ! defined $self->{_cache}->{$gnid};
+        next if ! defined $self->{_cache}->{$gnid};
+
+        my $oid2terms = $gncache->{$gnid}->{$geneID};
+        foreach my $oid (keys %$oid2terms) {
+          my $domain = $oid2terms->{$oid}->{ontology_type};
+          next if ($n_dl > 0) && (! defined $domainMap{$domain});
+          my $desc = $oid2terms->{$oid}->{ontology_description};
+          foreach my $ec (@{$oid2terms->{$oid}->{evidence_codes}}) {
+            next if $n_ec > 0 && (! defined $ecMap{$ec});
+            $g2idlist{$geneID} = {} if(! defined $g2idlist{$geneID}) ;
+            $g2idlist{$geneID}->{$oid} = [] if(! defined $g2idlist{$geneID}->{$oid});
+            push $g2idlist{$geneID}->{$oid}, {'domain' => $domain, 'ec' => $ec, 'desc' => $desc};
+          }
+        }
+      }
+    } 
 
     #END get_goidlist
     my @_bad_returns;
@@ -253,21 +332,13 @@ sub get_go_description
     my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
     my($results);
     #BEGIN get_go_description
-  my $dbh = $self->{_dbh};
-
+    load_ont($self, $ctx);
     my %go2desc = (); # gene to id list
     $results = \%go2desc;
-    my $pstmt = $dbh->prepare("select OntologyDescription, OntologyDomain from ontologies_int where OntologyID = ? and OntologyType = 'GO'");
-my @tm_goID;	
- foreach my $goID (@{$goIDList}) {
-	@tm_goID=split/\t/,$goID;
-	$goID=$tm_goID[0];
-      $pstmt->bind_param(1, $goID);
-      $pstmt->execute();
-      while( my @data = $pstmt->fetchrow_array()) {
-        $go2desc{$goID} = [$data[0],$data[1]];
-      } # end of fetch and counting
-    } # end of types
+    my $oid2term = $self->{_ont};
+    foreach my $goID (@{$goIDList}) {
+      $go2desc{$goID} = [$oid2term->{$goID}->{name}, $oid2term->{$goID}->{type}] if defined $oid2term->{$goID};
+    } 
     #END get_go_description
     my @_bad_returns;
     (ref($results) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
@@ -350,7 +421,8 @@ GoDesc is a string
 
 =item Description
 
-For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05. Also, if input species is not provided then by default Arabidopsis thaliana is considered the input species. The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
+For a given list of kbase gene ids from a particular genome (for example "Athaliana" ) find out the significantly enriched GO terms in your gene set. This function accepts four parameters: A list of kbase gene-identifiers, a list of ontology domains (e.g."biological process", "molecular function", "cellular component"), a list of evidence codes (e.g."IEA","IDA","IEP" etc.), and test type (e.g. "hypergeometric"). The list of kbase gene identifiers cannot be empty; however the list of ontology domains and the list of evidence codes can be empty. If any of these two lists is not empty then the gene-id and the go-id pairs retrieved from KBase are further filtered by using the desired ontology domains and/or evidence codes supplied as input. So, if you don't want to filter the initial results then it is recommended to provide empty domain and evidence code lists. Final filtered list of the kbase gene-id to go-ids mapping is used to calculate GO enrichment using hypergeometric test and provides pvalues.The default pvalue cutoff is used as 0.05.  
+The current released version ignores test type and by default, it uses hypergeometric test. So even if you do not provide TestType, it will do hypergeometric test.
 
 =back
 
@@ -378,7 +450,7 @@ sub get_go_enrichment
     #BEGIN get_go_enrichment
     my $frst = get_goidlist($self, $geneIDList, $domainList, $ecList);
     my %ukey = ();
-   my @tem_goID=();
+    my @tem_goID=();
 	foreach my $geneID (keys %{$frst}) {
 		foreach my $goID (keys %{$frst->{$geneID}}) {
        		if(defined $ukey{$goID}) {
@@ -393,35 +465,30 @@ sub get_go_enrichment
 
     my $geneSize = $#$geneIDList + 1;
     my @goIDList = keys %ukey;
-	my $sname;
-    $$geneIDList[0] =~ m/^(kb\|g\.\d+\.)/;
+    my $sname;
+    $$geneIDList[0] =~ m/^(kb\|g\.\d+)\./;
     $sname = $1;
-    # TODO: throw exception if there is no match
-    #$sname="Athaliana" if $geneIDList =~/g\.3899/;
-    #$sname="Ptrichocarpa" if $geneIDList =~/g\.3907/;
+
+    #load_ont_anno4genome($self, $sname); # will be called by get_goidlist
 
     my $rh_goDescList = get_go_description($self, \@goIDList);
-    my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList, $ontologytype);
-    my $wholeGeneSize = 10000;
-    my $dbh = $self->{_dbh};
-    my $pstmt = $dbh->prepare("select count( distinct kblocusid) from ontologies_int where kblocusid like '$sname%'");
-    $pstmt->execute();
-    my $res=$pstmt->fetchrow_hashref();
-    foreach (keys %$res){
-      $wholeGeneSize=$res->{$_};
-      last;
-    }
-          
-    for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
-      my $goDesc = $rh_goDescList->{$goIDList[$i]};
-      my $goSize = $rh_goID2Count->{$goIDList[$i]};
-
-	 # calc p-value using any h.g. test
-      my %rst = ();
-      $rst{"pvalue"} = calculateStatistic(n11 => $ukey{$goIDList[$i]}, n1p => $geneSize, np1 => $goSize, npp => $wholeGeneSize);
-      $rst{"goDesc"} = $goDesc;
-      $rst{"goID"} = $goIDList[$i];
-      push @$results, \%rst;
+    #my $rh_goID2Count = getGoSize( $sname, \@goIDList, $domainList, $ecList, $ontologytype);
+    my $rh_goID2Count = $self->{term_genes}->{$sname};
+    compute_tot_num_genes($self, $sname) if ! defined $self->{total_genes}->{$sname}; # should not happen
+    if( defined $self->{total_genes}->{$sname} && defined $self->{term_genes}->{$sname}) {
+      my $wholeGeneSize = $self->{total_genes}->{$sname};
+     
+      for(my $i = 0; $i <= $#goIDList; $i= $i+1) {
+        my $goDesc = $rh_goDescList->{$goIDList[$i]};
+        my $goSize = $rh_goID2Count->{$goIDList[$i]};
+     
+        # calc p-value using any h.g. test
+        my %rst = ();
+        $rst{"pvalue"} = calculateStatistic(n11 => $ukey{$goIDList[$i]}, n1p => $geneSize, np1 => $goSize, npp => $wholeGeneSize);
+        $rst{"goDesc"} = $goDesc;
+        $rst{"goID"} = $goIDList[$i];
+        push @$results, \%rst;
+      }
     }
     
     #END get_go_enrichment
@@ -515,30 +582,32 @@ sub get_go_annotation
     my $dbh = $self->{_dbh};
 
     my %gene2anno = (); # gene to id list
-    my $pstmt_exc = $dbh->prepare("select ontology_id, ontology_description, p_value, 'net_neighbor_enrichment' ontology_type from ontology_enrichment_annotation where kbfid = ?");
-    my $pstmt;
-    foreach my $geneID (@{$geneIDList}) {
-
-      $pstmt_exc->bind_param(1, $geneID);
-      $pstmt_exc->execute();
-      $pstmt = $pstmt_exc;
-      while( my $hr = $pstmt->fetchrow_hashref()) {
-        $gene2anno{$geneID} = [] if(! defined $gene2anno{$geneID}) ;
-        push @{$gene2anno{$geneID}}, $hr;
-      } 
-    } 
-    $pstmt_exc = $dbh->prepare("select ontology_id, ontology_description, 'GO' ontology_type from ontology_enr_anno_val where kbfid = ?");
-    foreach my $geneID (@{$geneIDList}) {
-
-      $pstmt_exc->bind_param(1, $geneID);
-      $pstmt_exc->execute();
-      $pstmt = $pstmt_exc;
-      while( my $hr = $pstmt->fetchrow_hashref()) {
-        $gene2anno{$geneID} = [] if(! defined $gene2anno{$geneID}) ;
-        push @{$gene2anno{$geneID}}, $hr;
-      } 
-    } 
     $results = { 'gene_enrichment_annotations' => \%gene2anno};
+    if(1 == 0) {
+        my $pstmt_exc = $dbh->prepare("select ontology_id, ontology_description, p_value, 'net_neighbor_enrichment' ontology_type from ontology_enrichment_annotation where kbfid = ?");
+        my $pstmt;
+        foreach my $geneID (@{$geneIDList}) {
+ 
+          $pstmt_exc->bind_param(1, $geneID);
+          $pstmt_exc->execute();
+          $pstmt = $pstmt_exc;
+          while( my $hr = $pstmt->fetchrow_hashref()) {
+            $gene2anno{$geneID} = [] if(! defined $gene2anno{$geneID}) ;
+            push @{$gene2anno{$geneID}}, $hr;
+          } 
+        } 
+        $pstmt_exc = $dbh->prepare("select ontology_id, ontology_description, 'GO' ontology_type from ontology_enr_anno_val where kbfid = ?");
+        foreach my $geneID (@{$geneIDList}) {
+ 
+          $pstmt_exc->bind_param(1, $geneID);
+          $pstmt_exc->execute();
+          $pstmt = $pstmt_exc;
+          while( my $hr = $pstmt->fetchrow_hashref()) {
+            $gene2anno{$geneID} = [] if(! defined $gene2anno{$geneID}) ;
+            push @{$gene2anno{$geneID}}, $hr;
+          } 
+        } 
+    }
     #END get_go_annotation
     my @_bad_returns;
     (ref($results) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
@@ -546,6 +615,159 @@ sub get_go_annotation
 	my $msg = "Invalid returns passed to get_go_annotation:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'get_go_annotation');
+    }
+    return($results);
+}
+
+
+
+
+=head2 association_test
+
+  $results = $obj->association_test($gene_list, $ws_name, $in_obj_id, $out_obj_id, $type, $correction_method, $cut_off)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$gene_list is a GeneIDList
+$ws_name is a string
+$in_obj_id is a string
+$out_obj_id is a string
+$type is a TestType
+$correction_method is a string
+$cut_off is a float
+$results is a reference to a hash where the key is a string and the value is a string
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+TestType is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$gene_list is a GeneIDList
+$ws_name is a string
+$in_obj_id is a string
+$out_obj_id is a string
+$type is a TestType
+$correction_method is a string
+$cut_off is a float
+$results is a reference to a hash where the key is a string and the value is a string
+GeneIDList is a reference to a list where each element is a GeneID
+GeneID is a string
+TestType is a string
+
+
+=end text
+
+
+
+=item Description
+
+Association Test
+gene_list is tested against each cluster in a network typed object with test method (TestType) and p-value correction method (correction_method).
+The current correction_method is either "none" or "bonferroni" and the default is "none" if it is not specified.
+The current test type, by default, uses hypergeometric test. Even if you do not provide TestType, it will do hypergeometric test.
+
+=back
+
+=cut
+
+sub association_test
+{
+    my $self = shift;
+    my($gene_list, $ws_name, $in_obj_id, $out_obj_id, $type, $correction_method, $cut_off) = @_;
+
+    my @_bad_arguments;
+    (ref($gene_list) eq 'ARRAY') or push(@_bad_arguments, "Invalid type for argument \"gene_list\" (value was \"$gene_list\")");
+    (!ref($ws_name)) or push(@_bad_arguments, "Invalid type for argument \"ws_name\" (value was \"$ws_name\")");
+    (!ref($in_obj_id)) or push(@_bad_arguments, "Invalid type for argument \"in_obj_id\" (value was \"$in_obj_id\")");
+    (!ref($out_obj_id)) or push(@_bad_arguments, "Invalid type for argument \"out_obj_id\" (value was \"$out_obj_id\")");
+    (!ref($type)) or push(@_bad_arguments, "Invalid type for argument \"type\" (value was \"$type\")");
+    (!ref($correction_method)) or push(@_bad_arguments, "Invalid type for argument \"correction_method\" (value was \"$correction_method\")");
+    (!ref($cut_off)) or push(@_bad_arguments, "Invalid type for argument \"cut_off\" (value was \"$cut_off\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to association_test:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'association_test');
+    }
+
+    my $ctx = $Bio::KBase::OntologyService::Service::CallContext;
+    my($results);
+    #BEGIN association_test
+    $results = {};
+
+    $cut_off = 1.0 if ! defined $cut_off;
+    my $geneSize = @$gene_list;
+    $$gene_list[0] =~ m/^(kb\|g\.\d+)/;
+    my $gnid = $1;
+    compute_tot_num_genes($self, $gnid);
+    my $tot_genes = $self->{total_genes}->{$gnid};
+
+
+    my $wsc = Bio::KBase::workspace::Client->new($self->{_params}->{ws_url}, token => $ctx->{'token'});
+    #$@ = undef;
+    my %nid2eid = ();
+    my %cid2genes = ();
+    my %cid2pv =();
+    my %ecid2pv = ();
+    #eval{
+      my $obj = $wsc->get_object({workspace => $ws_name, id  => $in_obj_id});
+      my $net = $obj->{data};
+      
+      foreach my $node (@{$net->{nodes}}) {
+        $nid2eid{$node->{id}} = $node->{entity_id};
+        $cid2genes{$node->{id}} = {} if($node->{entity_id} =~ m/cluster/ || $node->{entity_id} =~ m/clst/ || $node->{entity_id} =~ m/[|.]ps\.\d+\./);
+      }
+      foreach my $edge (@{$net->{edges}}) {
+        if(defined $cid2genes{$edge->{node_id1}} && ! defined $cid2genes{$edge->{node_id2}}) {
+          $cid2genes{$edge->{node_id1}}->{$nid2eid{$edge->{node_id2}}} = 1;
+        } elsif(! defined $cid2genes{$edge->{node_id1}} && defined $cid2genes{$edge->{node_id2}}) {
+          $cid2genes{$edge->{node_id2}}->{$nid2eid{$edge->{node_id1}}} = 1;
+        }
+      }
+      my %cid2cnt=();
+      foreach my $cid (keys %cid2genes) {
+        my $cnt  = 0;
+        foreach my $gid (@$gene_list) {
+          $cnt++ if defined $cid2genes{$cid}->{$gid};
+        }
+        #next if $cnt == 0;
+        $cid2pv{$cid} = calculateStatistic(n11 => $cnt, n1p => $geneSize, np1 => scalar keys %{$cid2genes{$cid}}, npp => $tot_genes);
+        #print STDERR "$cid2pv{$cid} = calculateStatistic(n11 => $cnt, n1p => $geneSize, np1 => ".(scalar keys %{$cid2genes{$cid}}).", npp => $tot_genes)\n";
+      }
+      my $pvm = keys %cid2pv;
+      foreach my $node (@{$net->{nodes}}) {
+        if(defined $cid2pv{$node->{id}}) {
+          if($correction_method eq "bonferroni") {
+            $node->{user_annotations}->{"cae.p_value"} = "".$cid2pv{$node->{id}} * $pvm if $cid2pv{$node->{id}} * $pvm <= $cut_off;
+
+            $ecid2pv{$node->{entity_id}} = $cid2pv{$node->{id}} * $pvm if $cid2pv{$node->{id}} * $pvm <= $cut_off;
+          } else { # none
+            $node->{user_annotations}->{"cae.p_value"} = "".$cid2pv{$node->{id}} if $cid2pv{$node->{id}} <= $cut_off;
+            $ecid2pv{$node->{entity_id}} = $cid2pv{$node->{id}} if $cid2pv{$node->{id}} <= $cut_off;
+          }
+        }
+      }
+      my $gls = join(',', @{$gene_list});
+      $wsc->save_objects({workspace => $ws_name, objects => [{type=>'KBaseNetworks.Network-1.0', name=>$out_obj_id, data=>$net, meta=>{source=>"$ws_name:$in_obj_id:$type:$correction_method:$gls:OntologyService.association_test"}}]}) if $out_obj_id ne "";
+      $results = \%ecid2pv;
+    #};
+    
+    
+    #END association_test
+    my @_bad_returns;
+    (ref($results) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"results\" (value was \"$results\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to association_test:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'association_test');
     }
     return($results);
 }
