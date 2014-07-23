@@ -103,7 +103,7 @@ sub new
     bless $self, $class;
     #BEGIN_CONSTRUCTOR
     my %params;
-    my @list = qw(ws_url, ws_un, ws_pw, ws_id, ws_type, erdb_url);
+    my @list = qw(ws_url, ws_un, ws_id, ws_type, erdb_url, ws_pw);
     if ((my $e = $ENV{KB_DEPLOYMENT_CONFIG}) && -e $ENV{KB_DEPLOYMENT_CONFIG}) {  
       my $service = $ENV{KB_SERVICE_NAME};
       if (defined($service)) {
