@@ -18,6 +18,8 @@ use JSON;
 #
  use Server;
 note("Create new service");
+$ENV{KB_DEPLOYMENT_CONFIG} = "/kb/deployment/deployment.cfg";
+$ENV{KB_SERVICE_NAME} = "ontology_service";
 my ($pid, $host) = Server::start('OntologyService');
 note("Test use:'".$host."' with PID=$pid");
 
@@ -29,6 +31,9 @@ my $goid="GO:0006979";
 my $genelist='kb|g.3899.locus.2366';
 my $gene_list='kb|g.3899.locus.2366,kb|g.3899.locus.1892,kb|g.3899.locus.2354,kb|g.3899.locus.2549,kb|g.3899.locus.2420,kb|g.3899.locus.2253,kb|g.3899.locus.2229';
 
+# new service take CDS id only
+$gene_list = "kb|g.3899.CDS.35386,kb|g.3899.CDS.35387";
+$genelist = $gene_list;
 
 note("Create Test::Cmd objects for all of the scripts");
 

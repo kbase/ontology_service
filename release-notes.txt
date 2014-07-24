@@ -3,6 +3,20 @@ OVERVIEW
 
 The main functionality of ontology service is to allow the retrieval of ontology term distribution for a given a set of genes and additionally, identifies statistically overrepresented GO terms within given gene sets. Ontology term distribution and enrichment analysis are one of the main functions needed for the Plants Feb. Demo. Currently, this service provides GO annotation for 13 plant genomes (refer to documentation).
 
+VERSION: 0.1.0 (Released 07/24/2014)
+---------------------------------------------------------------------------------------------
+NEW FEATURES:
+-This release switched back-end from relational store to Workspace service and achieved significant speed-ups.
+
+UPDATED FEATURES / MAJOR BUG FIXES:
+-Added generic association test for Network Typed Object (NTO).
+
+NEXT RELEASE PLAN:
+
+
+REQUIREMENT FOR DEPLOYMENT:
+Please set workspace service username and password. For testing KB_DEPLOYMENT_CONFIG and KB_SERVICE_NAME to be correctly set. For now, it is hard coded in testing scripts.
+
 VERSION: 0.0.1 (Released 11/28/2012)
 ---------------------------------------------------------------------------------------------
 NEW FEATURES:

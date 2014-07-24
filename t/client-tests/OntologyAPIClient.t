@@ -37,6 +37,8 @@ ok(defined $client, "client object is defined");
 #
  use Server;
 note("Create new service");
+$ENV{KB_DEPLOYMENT_CONFIG} = "/kb/deployment/deployment.cfg";
+$ENV{KB_SERVICE_NAME} = "ontology_service";
 my ($pid, $url) = Server::start('OntologyService');
 $client = undef;
 note("Attempting to connect to:'".$url."' with PID=$pid");
@@ -65,7 +67,7 @@ note("Test   getGOIDlist");
 #  Test - Use valid data. Expect hash with data to be returned
 
 #my $species = "Athaliana";
-my @genes   = qw(kb|g.3899.locus.192 kb|g.3899.locus.164);
+my @genes   = qw(kb|g.3899.CDS.35386 kb|g.3899.CDS.35387);
 my @domains = qw(biological_process molecular_function cellular_component);
 my @ecs     = qw(IEA TAS NAS EXP IDA IPI ISS);
 

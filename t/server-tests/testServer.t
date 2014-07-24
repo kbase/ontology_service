@@ -35,6 +35,8 @@ note("Create new service");
 #my $host=getHost(); my $port=getPort();
 #print "-> attempting to connect to:'".$host.":".$port."'\n";
 #my $oc = new_ok("Bio::KBase::OntologyService::Client",[$host.":".$port] );
+$ENV{KB_DEPLOYMENT_CONFIG} = "/kb/deployment/deployment.cfg";
+$ENV{KB_SERVICE_NAME} = "ontology_service";
 my $oc = Bio::KBase::OntologyService::OntologyServiceImpl->new();
 
 #use Server;
