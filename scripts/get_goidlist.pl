@@ -43,8 +43,8 @@ print version information
 
 =head1 EXAMPLE
 
- echo "kb|g.3899.locus.192" | get_goidlist 
- echo "kb|g.3899.locus.192" | get_goidlist --evidence_code=IEA
+ echo "kb|g.3899.CDS.35386" | get_goidlist 
+ echo "kb|g.3899.CDS.35386" | get_goidlist --evidence_code=IEA
  get_goidlist --help
  get_goidlist --version
 
@@ -90,7 +90,7 @@ MAN
 	print "\t--version\t\tprint version information\n";
 	print "\n";
 	print "Examples: \n";
-	print "echo 'kb|g.3899.locus.192,kb|g.3899.locus.2366' | get_goidlist --evidence_code=IEA";
+	print "echo 'kb|g.3899.CDS.35386,kb|g.3899.CDS.62006' | get_goidlist --evidence_code=IEA";
 	print "\n";
 	print "\n";
 	print "$0 --help\tprint out help\n";
@@ -104,7 +104,7 @@ MAN
 if($version)
 {
 	print "$0 version 0.1\n";
-	print "Copyright (C) 2012 Shinjae Yoo\n";
+	print "Copyright (C) 2014 Shinjae Yoo\n";
 	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
 	print "This is free software: you are free to change and redistribute it.\n";
 	print "There is NO WARRANTY, to the extent permitted by law.\n";

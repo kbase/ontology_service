@@ -79,7 +79,7 @@ MAN
 if($version)
 {
 	print "$0 version 0.1\n";
-	print "Copyright (C) 2012 Shinjae Yoo\n";
+	print "Copyright (C) 2014 Shinjae Yoo\n";
 	print "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.\n";
 	print "This is free software: you are free to change and redistribute it.\n";
 	print "There is NO WARRANTY, to the extent permitted by law.\n";
